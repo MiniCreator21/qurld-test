@@ -58,14 +58,14 @@ public class WorldHandler : MonoBehaviour
             {
                 List<int> newFace = new List<int>
                 {
-                    0,0,0,0,0,0,1,0,
                     0,1,0,0,0,0,0,0,
+                    0,0,0,0,0,0,1,0,
                     0,0,0,0,0,0,0,0,
-                    0,0,1,0,0,0,0,0,
-                    1,0,0,0,0,0,0,0,
-                    0,0,0,1,0,0,0,0,
-                    0,0,0,1,0,1,0,0,
-                    0,0,0,1,0,1,0,1
+                    0,0,0,0,0,1,0,0,
+                    0,0,0,0,0,0,0,1,
+                    0,0,0,0,1,0,0,0,
+                    0,0,1,0,1,0,0,0,
+                    1,0,1,0,1,0,0,0
                 };
                 worldSeed[i] = newFace;
             }
@@ -145,16 +145,16 @@ public class WorldHandler : MonoBehaviour
         List<int>[] gridSeed = new List<int>[6];
         List<int>[] blockSeed = new List<int>[6];
         SeedToGrid(ref gridSeed, ref blockSeed);
-        CreateGrid(x, y, z);
+        CreateGrid(x, y, z, gridSeed);
         CreateBlocks(blockSeed);
     }
     #region Seed to Grid Translation
-    private void SeedToGrid(ref List<int>[] gridSeed, ref List<int>[] blockSeed) //do grid seed 
+    private void SeedToGrid(ref List<int>[] gridSeed, ref List<int>[] blockSeed)
     {
         for (int currentFace = 0; currentFace < worldSeed.Length; currentFace++)
         {
-            List<int> newGridFace = new List<int>{};
-            List<int> newBlockFace = new List<int>{};
+            List<int> newGridFace = new List<int> { };
+            List<int> newBlockFace = new List<int> { };
             int currentPixel = 0;
             int currentLine;
             int pixelsOnLine;
@@ -168,7 +168,11 @@ public class WorldHandler : MonoBehaviour
                         {
                             if (i < worldSize[0])
                             {
-                                if (worldSeed[currentFace + 4][i + worldSize[0] * (worldSize[2] - 1)] != 1)
+                                if (worldSeed[currentFace + 4][i + worldSize[0] * (worldSize[2] - 1)] == 1)
+                                {
+                                    newGridFace.Add(1);
+                                }
+                                else
                                 {
                                     newGridFace.Add(0);
                                 }
@@ -178,6 +182,10 @@ public class WorldHandler : MonoBehaviour
                                 newGridFace.Add(1);
                             }
                         }
+                        else
+                        {
+                            newGridFace.Add(0);
+                        }
                     }
                     else if ((i + 1) % worldSize[0] == 0)
                     {
@@ -185,7 +193,11 @@ public class WorldHandler : MonoBehaviour
                         {
                             if (i < (worldSize[0] * worldSize[1]) && i > (worldSize[0] * (worldSize[1] - 1)))
                             {
-                                if (worldSeed[currentFace + 5][i] != 1)
+                                if (worldSeed[currentFace + 5][i] == 1)
+                                {
+                                    newGridFace.Add(1);
+                                }
+                                else
                                 {
                                     newGridFace.Add(0);
                                 }
@@ -194,6 +206,10 @@ public class WorldHandler : MonoBehaviour
                             {
                                 newGridFace.Add(1);
                             }
+                        }
+                        else
+                        {
+                            newGridFace.Add(0);
                         }
                     }
                     else
@@ -206,23 +222,19 @@ public class WorldHandler : MonoBehaviour
             }
             else if (currentFace == 1)
             {
-                currentLine = -1;
-                pixelsOnLine = worldSize[0];
                 for (int i = 0; i < worldSeed[currentFace].Count(); i++)
                 {
-                    if (pixelsOnLine == worldSize[0])
-                    {
-                        pixelsOnLine = 0;
-                        currentLine += 1;
-                        currentPixel = currentLine * worldSize[0] + worldSize[0] - 1;
-                    }
                     if (i % worldSize[0] == 0)
                     {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 2][i + worldSize[2] - 1] == 1)
+                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 2][i + worldSize[2] - 1] == 1) 
                         {
                             if (i < worldSize[0])
                             {
-                                if (worldSeed[currentFace + 3][i + worldSize[0] * (worldSize[2] - 1)] != 1)
+                                if (worldSeed[currentFace + 3][worldSize[0] - 1 - i] == 1) //to fix
+                                {
+                                    newGridFace.Add(1);
+                                }
+                                else
                                 {
                                     newGridFace.Add(0);
                                 }
@@ -232,14 +244,22 @@ public class WorldHandler : MonoBehaviour
                                 newGridFace.Add(1);
                             }
                         }
+                        else
+                        {
+                            newGridFace.Add(0);
+                        }
                     }
                     else if ((i + 1) % worldSize[0] == 0)
                     {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 1][i - worldSize[2] + 1] == 1)
+                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 1][i - worldSize[2] + 1] == 1) 
                         {
                             if (i < (worldSize[0] * worldSize[1]) && i > (worldSize[0] * (worldSize[1] - 1)))
                             {
-                                if (worldSeed[currentFace + 4][i] != 1)
+                                if (worldSeed[currentFace + 4][worldSize[0] * (worldSize[2] - 1) + (worldSize[0] * worldSize[2] - i)] == 1) //to fix
+                                {
+                                    newGridFace.Add(1);
+                                }
+                                else
                                 {
                                     newGridFace.Add(0);
                                 }
@@ -248,6 +268,10 @@ public class WorldHandler : MonoBehaviour
                             {
                                 newGridFace.Add(1);
                             }
+                        }
+                        else
+                        {
+                            newGridFace.Add(0);
                         }
                     }
                     else
@@ -255,8 +279,7 @@ public class WorldHandler : MonoBehaviour
                         newGridFace.Add(worldSeed[currentFace][i]);
                     }
                     newBlockFace.Add(worldSeed[currentFace][currentPixel]);
-                    pixelsOnLine += 1;
-                    currentPixel -= 1;
+                    currentPixel += 1;
                 }
             }
             else if (currentFace == 2)
@@ -281,6 +304,10 @@ public class WorldHandler : MonoBehaviour
                         {
                             newGridFace.Add(1);
                         }
+                        else
+                        {
+                            newGridFace.Add(0);
+                        }
                     }
                     else if (i < (worldSize[2] * worldSize[1]) && i > (worldSize[2] * (worldSize[1] - 1)))
                     {
@@ -288,10 +315,15 @@ public class WorldHandler : MonoBehaviour
                         {
                             newGridFace.Add(1);
                         }
+                        else
+                        {
+                            newGridFace.Add(0);
+                        }
                     }
                     else
                     {
-                        newGridFace.Add(worldSeed[currentFace][i]);
+                        Debug.Log(i);
+                        newGridFace.Add(worldSeed[currentFace][(currentLine + 1) * worldSize[2] - i]);
                     }
                     newBlockFace.Add(worldSeed[currentFace][currentPixel]);
                     pixelsOnLine += 1;
@@ -312,12 +344,20 @@ public class WorldHandler : MonoBehaviour
                         {
                             newGridFace.Add(1);
                         }
+                        else
+                        {
+                            newGridFace.Add(0);
+                        }
                     }
                     else if (i < (worldSize[2] * worldSize[1]) && i > (worldSize[2] * (worldSize[1] - 1)))
                     {
                         if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace - 2][i - worldSize[2] + 1] == 1)
                         {
                             newGridFace.Add(1);
+                        }
+                        else
+                        {
+                            newGridFace.Add(0);
                         }
                     }
                     else
@@ -341,6 +381,14 @@ public class WorldHandler : MonoBehaviour
                         currentLine += 1;
                         currentPixel = currentLine + (worldSize[2] - 1) * worldSize[0];
                     }
+                    if (i % worldSize[0] == 0 || (i + 1) % worldSize[0] == 0 || i < worldSize[0] || (i < (worldSize[0] * worldSize[2]) && i > (worldSize[0] * (worldSize[2] - 1))))
+                    {
+                        //be happy (don't add) 
+                    }
+                    else
+                    {
+                        newGridFace.Add(worldSeed[currentFace][worldSize[0] * (worldSize[2] - 1) + currentLine - worldSize[0] * (i % worldSize[0])]);
+                    }
                     newBlockFace.Add(worldSeed[currentFace][currentPixel]);
                     pixelsOnLine += 1;
                     currentPixel -= worldSize[2];
@@ -358,19 +406,33 @@ public class WorldHandler : MonoBehaviour
                         currentLine += 1;
                         currentPixel = currentLine;
                     }
-                    //Debug.Log(currentPixel);
+                    if (i % worldSize[0] == 0 || (i + 1) % worldSize[0] == 0 || i < worldSize[0] || (i < (worldSize[0] * worldSize[2]) && i > (worldSize[0] * (worldSize[2] - 1))))
+                    {
+                        //be happy (don't add) 
+                    }
+                    else
+                    {
+                        newGridFace.Add(worldSeed[currentFace][currentLine + worldSize[0] * (i % worldSize[0])]);
+                    }
                     newBlockFace.Add(worldSeed[currentFace][currentPixel]);
                     pixelsOnLine += 1;
                     currentPixel += worldSize[2];
                 }
             }
-            gridSeed[currentFace] = newGridFace; 
-            blockSeed[currentFace] = newBlockFace; 
+            gridSeed[currentFace] = newGridFace;
+            blockSeed[currentFace] = newBlockFace;
+        }
+        for (int i = 0; i < gridSeed.Length; i++)
+        {
+            for (int j = 0; j < gridSeed[i].Count(); j++)
+            {
+                //Debug.Log(gridSeed[i][j]);
+            }
         }
     }
     #endregion
     #region Grid Creation 
-    private void CreateGrid(int x, int y, int z)
+    private void CreateGrid(int x, int y, int z, List<int>[] gridSeed)
     {
         int currentFace = 0;
         int currentPixel = 0;
@@ -387,7 +449,7 @@ public class WorldHandler : MonoBehaviour
             {
                 for (int k = 0; k < x; k++)
                 {
-                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+                    if (gridSeed[currentFace][j * worldSize[0] + k] != 1) Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
                     xPosition += pixelSize;
                     currentPixel += 1;
                 }
@@ -410,7 +472,8 @@ public class WorldHandler : MonoBehaviour
             {
                 for (int k = 0; k < z - 2; k++)
                 {
-                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+                    //Debug.Log(j * worldSize[2] + k);
+                    if (gridSeed[currentFace][j * worldSize[2] + k] != 1) Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
                     zPosition += pixelSize;
                     currentPixel += 1;
                 }
@@ -433,7 +496,7 @@ public class WorldHandler : MonoBehaviour
             {
                 for (int k = 0; k < z - 2; k++)
                 {
-                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+                    if (gridSeed[currentFace][j * worldSize[0] + k] != 1) Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
                     zPosition += pixelSize;
                     currentPixel += 1;
                 }
