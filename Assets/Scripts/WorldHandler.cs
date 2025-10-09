@@ -155,282 +155,79 @@ public class WorldHandler : MonoBehaviour
         {
             List<int> newGridFace = new List<int> { };
             List<int> newBlockFace = new List<int> { };
-            int currentPixel = 0;
-            int currentLine;
-            int pixelsOnLine;
             if (currentFace == 0)
             {
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
-                {
-                    if (i % worldSize[0] == 0)
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 2][i + worldSize[2] - 1] == 1)
-                        {
-                            if (i < worldSize[0])
-                            {
-                                if (worldSeed[currentFace + 4][i + worldSize[0] * (worldSize[2] - 1)] == 1)
-                                {
-                                    newGridFace.Add(1);
-                                }
-                                else
-                                {
-                                    newGridFace.Add(0);
-                                }
-                            }
-                            else
-                            {
-                                newGridFace.Add(1);
-                            }
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else if ((i + 1) % worldSize[0] == 0)
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 3][i - worldSize[2] + 1] == 1)
-                        {
-                            if (i < (worldSize[0] * worldSize[1]) && i > (worldSize[0] * (worldSize[1] - 1)))
-                            {
-                                if (worldSeed[currentFace + 5][i] == 1)
-                                {
-                                    newGridFace.Add(1);
-                                }
-                                else
-                                {
-                                    newGridFace.Add(0);
-                                }
-                            }
-                            else
-                            {
-                                newGridFace.Add(1);
-                            }
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else
-                    {
-                        newGridFace.Add(worldSeed[currentFace][i]);
-                    }
-                    newBlockFace.Add(worldSeed[currentFace][currentPixel]);
-                    currentPixel += 1;
-                }
+                newBlockFace = CopyList(worldSeed[currentFace]);
             }
             else if (currentFace == 1)
             {
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
-                {
-                    if (i % worldSize[0] == 0)
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 2][i + worldSize[2] - 1] == 1) 
-                        {
-                            if (i < worldSize[0])
-                            {
-                                if (worldSeed[currentFace + 3][worldSize[0] - 1 - i] == 1) //to fix
-                                {
-                                    newGridFace.Add(1);
-                                }
-                                else
-                                {
-                                    newGridFace.Add(0);
-                                }
-                            }
-                            else
-                            {
-                                newGridFace.Add(1);
-                            }
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else if ((i + 1) % worldSize[0] == 0)
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace + 1][i - worldSize[2] + 1] == 1) 
-                        {
-                            if (i < (worldSize[0] * worldSize[1]) && i > (worldSize[0] * (worldSize[1] - 1)))
-                            {
-                                if (worldSeed[currentFace + 4][worldSize[0] * (worldSize[2] - 1) + (worldSize[0] * worldSize[2] - i)] == 1) //to fix
-                                {
-                                    newGridFace.Add(1);
-                                }
-                                else
-                                {
-                                    newGridFace.Add(0);
-                                }
-                            }
-                            else
-                            {
-                                newGridFace.Add(1);
-                            }
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else
-                    {
-                        newGridFace.Add(worldSeed[currentFace][i]);
-                    }
-                    newBlockFace.Add(worldSeed[currentFace][currentPixel]);
-                    currentPixel += 1;
-                }
+                newBlockFace = ReverseListHorizontal(worldSeed[currentFace], worldSize[0]);
             }
             else if (currentFace == 2)
             {
-                currentLine = -1;
-                pixelsOnLine = worldSize[2];
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
-                {
-                    if (pixelsOnLine == worldSize[2])
-                    {
-                        pixelsOnLine = 0;
-                        currentLine += 1;
-                        currentPixel = currentLine * worldSize[2] + worldSize[2] - 1;
-                    }
-                    if (i % worldSize[2] == 0 || (i + 1) % worldSize[2] == 0)
-                    {
-                        //be happy (don't add) 
-                    }
-                    else if (i < worldSize[2])
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace - 1][i + worldSize[2] - 1] == 1)
-                        {
-                            newGridFace.Add(1);
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else if (i < (worldSize[2] * worldSize[1]) && i > (worldSize[2] * (worldSize[1] - 1)))
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace - 2][i - worldSize[2] + 1] == 1)
-                        {
-                            newGridFace.Add(1);
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else
-                    {
-                        Debug.Log(i);
-                        newGridFace.Add(worldSeed[currentFace][(currentLine + 1) * worldSize[2] - i]);
-                    }
-                    newBlockFace.Add(worldSeed[currentFace][currentPixel]);
-                    pixelsOnLine += 1;
-                    currentPixel -= 1;
-                }
+                newBlockFace = ReverseListHorizontal(worldSeed[currentFace], worldSize[2]);
             }
             else if (currentFace == 3)
             {
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
-                {
-                    if (i % worldSize[2] == 0 || (i + 1) % worldSize[2] == 0)
-                    {
-                        //be happy (don't add) 
-                    }
-                    else if (i < worldSize[2])
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace - 3][i + worldSize[2] - 1] == 1)
-                        {
-                            newGridFace.Add(1);
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else if (i < (worldSize[2] * worldSize[1]) && i > (worldSize[2] * (worldSize[1] - 1)))
-                    {
-                        if (worldSeed[currentFace][i] == 1 && worldSeed[currentFace - 2][i - worldSize[2] + 1] == 1)
-                        {
-                            newGridFace.Add(1);
-                        }
-                        else
-                        {
-                            newGridFace.Add(0);
-                        }
-                    }
-                    else
-                    {
-                        newGridFace.Add(worldSeed[currentFace][i]);
-                    }
-                    newBlockFace.Add(worldSeed[currentFace][currentPixel]);
-                    currentPixel += 1;
-                }
+                newBlockFace = CopyList(worldSeed[currentFace]);
             }
             else if (currentFace == 4)
             {
-                currentPixel = (worldSize[2] - 1) * worldSize[0] - 1;
-                currentLine = -1;
-                pixelsOnLine = worldSize[2];
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
-                {
-                    if (pixelsOnLine == worldSize[2])
-                    {
-                        pixelsOnLine = 0;
-                        currentLine += 1;
-                        currentPixel = currentLine + (worldSize[2] - 1) * worldSize[0];
-                    }
-                    if (i % worldSize[0] == 0 || (i + 1) % worldSize[0] == 0 || i < worldSize[0] || (i < (worldSize[0] * worldSize[2]) && i > (worldSize[0] * (worldSize[2] - 1))))
-                    {
-                        //be happy (don't add) 
-                    }
-                    else
-                    {
-                        newGridFace.Add(worldSeed[currentFace][worldSize[0] * (worldSize[2] - 1) + currentLine - worldSize[0] * (i % worldSize[0])]);
-                    }
-                    newBlockFace.Add(worldSeed[currentFace][currentPixel]);
-                    pixelsOnLine += 1;
-                    currentPixel -= worldSize[2];
-                }
+                newBlockFace = CopyList(worldSeed[currentFace]);
+                newBlockFace = ReverseListVertical(newBlockFace, worldSize[0], worldSize[2]);
             }
             else if (currentFace == 5)
             {
-                currentLine = -1;
-                pixelsOnLine = worldSize[2];
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
-                {
-                    if (pixelsOnLine == worldSize[2])
-                    {
-                        pixelsOnLine = 0;
-                        currentLine += 1;
-                        currentPixel = currentLine;
-                    }
-                    if (i % worldSize[0] == 0 || (i + 1) % worldSize[0] == 0 || i < worldSize[0] || (i < (worldSize[0] * worldSize[2]) && i > (worldSize[0] * (worldSize[2] - 1))))
-                    {
-                        //be happy (don't add) 
-                    }
-                    else
-                    {
-                        newGridFace.Add(worldSeed[currentFace][currentLine + worldSize[0] * (i % worldSize[0])]);
-                    }
-                    newBlockFace.Add(worldSeed[currentFace][currentPixel]);
-                    pixelsOnLine += 1;
-                    currentPixel += worldSize[2];
-                }
+                newBlockFace = CopyList(worldSeed[currentFace]);
             }
             gridSeed[currentFace] = newGridFace;
             blockSeed[currentFace] = newBlockFace;
         }
-        for (int i = 0; i < gridSeed.Length; i++)
+    }
+
+    private List<int> CopyList(List<int> toCopy)
+    {
+        List<int> newCopy = new List<int> { };
+        for (int i = 0; i < toCopy.Count(); i++)
         {
-            for (int j = 0; j < gridSeed[i].Count(); j++)
-            {
-                //Debug.Log(gridSeed[i][j]);
-            }
+            newCopy.Add(toCopy[i]);
         }
+        return newCopy;
+    }
+    private List<int> ReverseListHorizontal(List<int> toReverse, int horizontalSize)
+    {
+        List<int> newList = new List<int> { };
+        int currentLine = -1;
+        int pixelsOnLine;
+        for (int i = 0; i < toReverse.Count(); i++)
+        {
+            pixelsOnLine = i % horizontalSize;
+            if (pixelsOnLine == 0)
+            {
+                currentLine += 1;
+            }
+            newList.Add(toReverse[(currentLine + 1) * horizontalSize - 1 - pixelsOnLine]);
+        }
+        return newList;
+    }
+    private List<int> ReverseListVertical(List<int> toReverse, int horizontalSize, int verticalSize)
+    {
+        List<int> newList = new List<int> { };
+        int currentLine = verticalSize;
+        int pixelsOnLine;
+        for (int i = 0; i < toReverse.Count(); i++)
+        {
+            pixelsOnLine = i % horizontalSize;
+            if (pixelsOnLine == 0)
+            {
+                currentLine -= 1;
+            }
+            newList.Add(currentLine * horizontalSize + pixelsOnLine);
+        }
+        return newList;
     }
     #endregion
+
     #region Grid Creation 
     private void CreateGrid(int x, int y, int z, List<int>[] gridSeed)
     {
@@ -449,7 +246,8 @@ public class WorldHandler : MonoBehaviour
             {
                 for (int k = 0; k < x; k++)
                 {
-                    if (gridSeed[currentFace][j * worldSize[0] + k] != 1) Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+                    //if (gridSeed[currentFace][j * worldSize[0] + k] != 1) 
+                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
                     xPosition += pixelSize;
                     currentPixel += 1;
                 }
@@ -472,8 +270,8 @@ public class WorldHandler : MonoBehaviour
             {
                 for (int k = 0; k < z - 2; k++)
                 {
-                    //Debug.Log(j * worldSize[2] + k);
-                    if (gridSeed[currentFace][j * worldSize[2] + k] != 1) Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+                    //if (gridSeed[currentFace][j * worldSize[2] + k] != 1) 
+                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
                     zPosition += pixelSize;
                     currentPixel += 1;
                 }
@@ -496,7 +294,8 @@ public class WorldHandler : MonoBehaviour
             {
                 for (int k = 0; k < z - 2; k++)
                 {
-                    if (gridSeed[currentFace][j * worldSize[0] + k] != 1) Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+                    //if (gridSeed[currentFace][j * worldSize[0] + k] != 1) 
+                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
                     zPosition += pixelSize;
                     currentPixel += 1;
                 }
