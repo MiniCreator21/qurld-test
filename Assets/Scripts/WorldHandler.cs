@@ -8,7 +8,8 @@ using UnityEngine;
 public class WorldHandler : MonoBehaviour
 {
     #region Dependencies
-    [SerializeField] private GameObject worldVoxel;
+    [SerializeField] private GameObject gridVoxel;
+    [SerializeField] private GameObject blockVoxel;
     #endregion
     #region Public Fields
     #endregion
@@ -281,10 +282,8 @@ public class WorldHandler : MonoBehaviour
         }
         for (int i = 0; i < blockPositions.Count(); i++)
         {
-            VoxelPosition testVoxel = new VoxelPosition{};
-            newVoxel.voxelPosition.x = blockPositions[i].voxelPosition.x;
-            newVoxel.voxelPosition.y = blockPositions[i].voxelPosition.y;
-            newVoxel.voxelPosition.z = blockPositions[i].voxelPosition.z;
+            VoxelPosition testVoxel;
+            newVoxel.voxelPosition = blockPositions[i].voxelPosition;
             if (!blockPositions[i].voxelInPosition) newVoxel.voxelInPosition = true;
             else if (blockPositions[i].voxelInPosition) newVoxel.voxelInPosition = false;
             if (newVoxel.voxelPosition.x == 0)
@@ -332,9 +331,48 @@ public class WorldHandler : MonoBehaviour
                 gridPositions.Add(newVoxel);
             }
         }
-        for (int i = 0; i < gridPositions.Count(); i++)
+        for (int i = 0; i < blockPositions.Count(); i++)
         {
-            Debug.Log(gridPositions[i].voxelPosition);
+            if (blockPositions[i].voxelInPosition)
+            {
+                newVoxel = blockPositions[i];
+                if (blockPositions[i].voxelPosition.x == 1)
+                {
+                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                    newVoxel.voxelPosition.x -= 1;
+                    if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
+                }
+                if (blockPositions[i].voxelPosition.x == worldSize[0])
+                {
+                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                    newVoxel.voxelPosition.x += 1;
+                    if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
+                }
+                if (blockPositions[i].voxelPosition.y == -1)
+                {
+                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                    newVoxel.voxelPosition.y += 1;
+                    if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
+                }
+                if (blockPositions[i].voxelPosition.y == -worldSize[1])
+                {
+                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                    newVoxel.voxelPosition.y -= 1;
+                    if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
+                }
+                if (blockPositions[i].voxelPosition.z == 1)
+                {
+                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                    newVoxel.voxelPosition.z -= 1;
+                    if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
+                }
+                if (blockPositions[i].voxelPosition.z == worldSize[2])
+                {
+                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                    newVoxel.voxelPosition.z += 1;
+                    if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
+                }
+            }
         }
     }
     #endregion
@@ -344,8 +382,8 @@ public class WorldHandler : MonoBehaviour
     {
         float pixelSizeOffset = voxelSize / 2;
         float xPositionStart = -(worldSize[0] + 1) / 2 - pixelSizeOffset;
-        float yPositionStart = (worldSize[1] + 2) / 2 + pixelSizeOffset;
-        float zPositionStart = pixelSizeOffset - 2;
+        float yPositionStart = (worldSize[1] + 1) / 2 + pixelSizeOffset;
+        float zPositionStart = pixelSizeOffset + 8;
         float xPosition;
         float yPosition;
         float zPosition;
@@ -356,15 +394,18 @@ public class WorldHandler : MonoBehaviour
                 xPosition = xPositionStart + gridPositions[i].voxelPosition.x;
                 yPosition = yPositionStart + gridPositions[i].voxelPosition.y;
                 zPosition = zPositionStart + gridPositions[i].voxelPosition.z;
-                Instantiate(worldVoxel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+                Instantiate(gridVoxel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
             }
         }
         for (int i = 0; i < blockPositions.Count(); i++)
         {
-            xPosition = xPositionStart + blockPositions[i].voxelPosition.x;
-            yPosition = yPositionStart + blockPositions[i].voxelPosition.y;
-            zPosition = zPositionStart + blockPositions[i].voxelPosition.z;
-            //Instantiate(worldVoxel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+            if (blockPositions[i].voxelInPosition)
+            {
+                xPosition = xPositionStart + blockPositions[i].voxelPosition.x;
+                yPosition = yPositionStart + blockPositions[i].voxelPosition.y;
+                zPosition = zPositionStart + blockPositions[i].voxelPosition.z;
+                Instantiate(blockVoxel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
+            }
         }
     }
     #endregion

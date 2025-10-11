@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 2211472341998654400}
   - component: {fileID: 6364365029441308278}
   m_Layer: 0
-  m_Name: WorldVoxel
+  m_Name: GridVoxel
   m_TagString: World
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
