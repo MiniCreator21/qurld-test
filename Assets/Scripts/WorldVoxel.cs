@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class WorldPixel : MonoBehaviour
+public class WorldVoxel : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()

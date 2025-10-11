@@ -12,9 +12,9 @@ GameObject:
   - component: {fileID: 3138123126540823811}
   - component: {fileID: 8042143061324852317}
   - component: {fileID: 2211472341998654400}
-  - component: {fileID: 8878217513708063221}
+  - component: {fileID: 6364365029441308278}
   m_Layer: 0
-  m_Name: WorldPixel
+  m_Name: WorldVoxel
   m_TagString: World
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -113,7 +113,7 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8878217513708063221
+--- !u!114 &6364365029441308278
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,7 +124,7 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6d8bd3769c646594091c9c5df60458a9, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WorldPixel
+  m_EditorClassIdentifier: Assembly-CSharp::WorldVoxel
 --- !u!1 &272426407895283304
 GameObject:
   m_ObjectHideFlags: 0
@@ -137,7 +137,7 @@ GameObject:
   - component: {fileID: 7208611284744564954}
   - component: {fileID: 2238665326257960659}
   m_Layer: 0
-  m_Name: PixelEdge4
+  m_Name: VoxelEdge4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -226,7 +226,7 @@ GameObject:
   - component: {fileID: 6883522504796761495}
   - component: {fileID: 5476648527618912890}
   m_Layer: 0
-  m_Name: PixelEdge12
+  m_Name: VoxelEdge12
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -315,7 +315,7 @@ GameObject:
   - component: {fileID: 3281822525944843968}
   - component: {fileID: 5559064473476856272}
   m_Layer: 0
-  m_Name: PixelEdge2
+  m_Name: VoxelEdge2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -404,7 +404,7 @@ GameObject:
   - component: {fileID: 5841152609927196410}
   - component: {fileID: 1634652687064002418}
   m_Layer: 0
-  m_Name: PixelEdge9
+  m_Name: VoxelEdge9
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -493,7 +493,7 @@ GameObject:
   - component: {fileID: 7402706212578496994}
   - component: {fileID: 5544215792969546093}
   m_Layer: 0
-  m_Name: PixelEdge1
+  m_Name: VoxelEdge1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -580,7 +580,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6508809280702492912}
   m_Layer: 0
-  m_Name: PixelEdges
+  m_Name: VoxelEdges
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -625,7 +625,7 @@ GameObject:
   - component: {fileID: 4441971576817853890}
   - component: {fileID: 9173646265320116882}
   m_Layer: 0
-  m_Name: PixelEdge10
+  m_Name: VoxelEdge10
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -714,7 +714,7 @@ GameObject:
   - component: {fileID: 4312899195343743841}
   - component: {fileID: 6853357395364254920}
   m_Layer: 0
-  m_Name: PixelEdge3
+  m_Name: VoxelEdge3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -803,7 +803,7 @@ GameObject:
   - component: {fileID: 8296159334224201422}
   - component: {fileID: 5276067863950068208}
   m_Layer: 0
-  m_Name: PixelEdge6
+  m_Name: VoxelEdge6
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -892,7 +892,7 @@ GameObject:
   - component: {fileID: 5002412427510686500}
   - component: {fileID: 8606653926417652996}
   m_Layer: 0
-  m_Name: PixelEdge7
+  m_Name: VoxelEdge7
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -981,7 +981,7 @@ GameObject:
   - component: {fileID: 1967212526456274753}
   - component: {fileID: 166484845723123851}
   m_Layer: 0
-  m_Name: PixelEdge11
+  m_Name: VoxelEdge11
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1070,7 +1070,7 @@ GameObject:
   - component: {fileID: 3824306662336421317}
   - component: {fileID: 3594099445681142794}
   m_Layer: 0
-  m_Name: PixelEdge5
+  m_Name: VoxelEdge5
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1159,7 +1159,7 @@ GameObject:
   - component: {fileID: 1901023313574646033}
   - component: {fileID: 892494557563116211}
   m_Layer: 0
-  m_Name: PixelEdge8
+  m_Name: VoxelEdge8
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

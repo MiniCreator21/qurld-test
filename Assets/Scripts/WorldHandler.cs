@@ -1,28 +1,39 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using NUnit.Framework.Internal;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
 public class WorldHandler : MonoBehaviour
 {
     #region Dependencies
-    [SerializeField] private GameObject worldPixel;
+    [SerializeField] private GameObject worldVoxel;
     #endregion
     #region Public Fields
     #endregion
     #region Private Variables
-    [SerializeField] private float pixelSize = 1f;
-    private GameObject[,] worldPixels;
     private int[] worldSize = { 8, 8, 8 };
     private List<int>[] worldSeed;
+    [SerializeField] private float voxelSize = 1f;
+    private List<GameObject> GridVoxels;
+    #endregion
+    #region Voxel Struct
+    [System.Serializable]
+    public struct VoxelPosition
+    {
+        public bool voxelInPosition;
+        public Vector3 voxelPosition;
+    }
+    private List<VoxelPosition> gridPositions;
+    private List<VoxelPosition> blockPositions;
     #endregion
 
     #region Start
     void Start()
     {
         CreateSeed(worldSize[0], worldSize[1], worldSize[2]);
-        CreateWorld(worldSize[0], worldSize[1], worldSize[2]);
+        CreateWorld();
     }
     #endregion
 
@@ -34,7 +45,7 @@ public class WorldHandler : MonoBehaviour
     #endregion
 
     #region Seed Creation
-    private void CreateSeed(int x, int y, int z)
+    private void CreateSeed(int xSize, int ySize, int zSize)
     {
         worldSeed = new List<int>[6];
         for (int i = 0; i < 2; i++) //iterates through front and back sides of cube 
@@ -140,185 +151,220 @@ public class WorldHandler : MonoBehaviour
     #endregion
 
     #region World Creation
-    private void CreateWorld(int x, int y, int z)
+    private void CreateWorld()
     {
-        List<int>[] gridSeed = new List<int>[6];
-        List<int>[] blockSeed = new List<int>[6];
-        SeedToGrid(ref gridSeed, ref blockSeed);
-        CreateGrid(x, y, z, gridSeed);
-        CreateBlocks(blockSeed);
+        SeedToPositions();
+        CreateGridAndBlocks();
     }
-    #region Seed to Grid Translation
-    private void SeedToGrid(ref List<int>[] gridSeed, ref List<int>[] blockSeed)
+    #region Seed to Positions Translation
+    private void SeedToPositions()
     {
+        gridPositions = new List<VoxelPosition>{};
+        blockPositions = new List<VoxelPosition>{};
+        VoxelPosition newVoxel = new VoxelPosition{};
         for (int currentFace = 0; currentFace < worldSeed.Length; currentFace++)
         {
-            List<int> newGridFace = new List<int> { };
-            List<int> newBlockFace = new List<int> { };
             if (currentFace == 0)
             {
-                newBlockFace = CopyList(worldSeed[currentFace]);
+                int currentRow = 1;
+                int currentColumn;
+                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                {
+                    currentColumn = i % worldSize[0];
+                    if (currentColumn == 0)
+                    {
+                        currentRow -= 1;
+                    }
+                    newVoxel.voxelPosition.x = currentColumn + 1;
+                    newVoxel.voxelPosition.y = currentRow - 1;
+                    newVoxel.voxelPosition.z = 0;
+                    if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
+                    if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
+                    blockPositions.Add(newVoxel);
+                }
             }
             else if (currentFace == 1)
             {
-                newBlockFace = ReverseListHorizontal(worldSeed[currentFace], worldSize[0]);
+                int currentRow = 1;
+                int currentColumn;
+                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                {
+                    currentColumn = worldSize[0] - 1 - i % worldSize[0];
+                    if (currentColumn == worldSize[0] - 1)
+                    {
+                        currentRow -= 1;
+                    }
+                    newVoxel.voxelPosition.x = currentColumn + 1;
+                    newVoxel.voxelPosition.y = currentRow - 1;
+                    newVoxel.voxelPosition.z = worldSize[2] + 1;
+                    if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
+                    if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
+                    blockPositions.Add(newVoxel);
+                }
             }
             else if (currentFace == 2)
             {
-                newBlockFace = ReverseListHorizontal(worldSeed[currentFace], worldSize[2]);
+                int currentRow = 1;
+                int currentColumn;
+                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                {
+                    currentColumn = worldSize[2] - 1 - i % worldSize[2];
+                    if (currentColumn == worldSize[2] - 1)
+                    {
+                        currentRow -= 1;
+                    }
+                    newVoxel.voxelPosition.x = 0;
+                    newVoxel.voxelPosition.y = currentRow - 1;
+                    newVoxel.voxelPosition.z = currentColumn + 1;
+                    if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
+                    if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
+                    blockPositions.Add(newVoxel);
+                }
             }
             else if (currentFace == 3)
             {
-                newBlockFace = CopyList(worldSeed[currentFace]);
+                int currentRow = 1;
+                int currentColumn;
+                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                {
+                    currentColumn = i % worldSize[2];
+                    if (currentColumn == 0)
+                    {
+                        currentRow -= 1;
+                    }
+                    newVoxel.voxelPosition.x = worldSize[0] + 1;
+                    newVoxel.voxelPosition.y = currentRow - 1;
+                    newVoxel.voxelPosition.z = currentColumn + 1;
+                    if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
+                    if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
+                    blockPositions.Add(newVoxel);
+                }
             }
             else if (currentFace == 4)
             {
-                newBlockFace = CopyList(worldSeed[currentFace]);
-                newBlockFace = ReverseListVertical(newBlockFace, worldSize[0], worldSize[2]);
+                int currentRow = worldSize[2];
+                int currentColumn;
+                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                {
+                    currentColumn = i % worldSize[0];
+                    if (currentColumn == 0)
+                    {
+                        currentRow -= 1;
+                    }
+                    newVoxel.voxelPosition.x = currentColumn + 1;
+                    newVoxel.voxelPosition.y = 0;
+                    newVoxel.voxelPosition.z = currentRow + 1;
+                    if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
+                    if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
+                    blockPositions.Add(newVoxel);
+                }
             }
             else if (currentFace == 5)
             {
-                newBlockFace = CopyList(worldSeed[currentFace]);
+                int currentRow = -1;
+                int currentColumn;
+                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                {
+                    currentColumn = i % worldSize[0];
+                    if (currentColumn == 0)
+                    {
+                        currentRow += 1;
+                    }
+                    newVoxel.voxelPosition.x = currentColumn + 1;
+                    newVoxel.voxelPosition.y = -worldSize[1] - 1;
+                    newVoxel.voxelPosition.z = currentRow + 1;
+                    if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
+                    if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
+                    blockPositions.Add(newVoxel);
+                }
             }
-            gridSeed[currentFace] = newGridFace;
-            blockSeed[currentFace] = newBlockFace;
         }
-    }
-
-    private List<int> CopyList(List<int> toCopy)
-    {
-        List<int> newCopy = new List<int> { };
-        for (int i = 0; i < toCopy.Count(); i++)
+        for (int i = 0; i < blockPositions.Count(); i++)
         {
-            newCopy.Add(toCopy[i]);
-        }
-        return newCopy;
-    }
-    private List<int> ReverseListHorizontal(List<int> toReverse, int horizontalSize)
-    {
-        List<int> newList = new List<int> { };
-        int currentLine = -1;
-        int pixelsOnLine;
-        for (int i = 0; i < toReverse.Count(); i++)
-        {
-            pixelsOnLine = i % horizontalSize;
-            if (pixelsOnLine == 0)
+            VoxelPosition testVoxel = new VoxelPosition{};
+            newVoxel.voxelPosition.x = blockPositions[i].voxelPosition.x;
+            newVoxel.voxelPosition.y = blockPositions[i].voxelPosition.y;
+            newVoxel.voxelPosition.z = blockPositions[i].voxelPosition.z;
+            if (!blockPositions[i].voxelInPosition) newVoxel.voxelInPosition = true;
+            else if (blockPositions[i].voxelInPosition) newVoxel.voxelInPosition = false;
+            if (newVoxel.voxelPosition.x == 0)
             {
-                currentLine += 1;
+                newVoxel.voxelPosition.x += 1;
             }
-            newList.Add(toReverse[(currentLine + 1) * horizontalSize - 1 - pixelsOnLine]);
-        }
-        return newList;
-    }
-    private List<int> ReverseListVertical(List<int> toReverse, int horizontalSize, int verticalSize)
-    {
-        List<int> newList = new List<int> { };
-        int currentLine = verticalSize;
-        int pixelsOnLine;
-        for (int i = 0; i < toReverse.Count(); i++)
-        {
-            pixelsOnLine = i % horizontalSize;
-            if (pixelsOnLine == 0)
+            else if (newVoxel.voxelPosition.x == worldSize[0] + 1)
             {
-                currentLine -= 1;
+                newVoxel.voxelPosition.x -= 1;
             }
-            newList.Add(currentLine * horizontalSize + pixelsOnLine);
+            else if (newVoxel.voxelPosition.y == 0)
+            {
+                newVoxel.voxelPosition.y -= 1;
+            }
+            else if (newVoxel.voxelPosition.y == -worldSize[1] - 1)
+            {
+                newVoxel.voxelPosition.y += 1;
+            }
+            else if (newVoxel.voxelPosition.z == 0)
+            {
+                newVoxel.voxelPosition.z += 1;
+            }
+            else if (newVoxel.voxelPosition.z == worldSize[2] + 1)
+            {
+                newVoxel.voxelPosition.z -= 1;
+            }
+            testVoxel = newVoxel;
+            testVoxel.voxelInPosition = !testVoxel.voxelInPosition;
+            if (gridPositions.Contains(newVoxel) || gridPositions.Contains(testVoxel)) 
+            {
+                for (int j = 0; j < gridPositions.Count(); j++)
+                {
+                    if (gridPositions[j].voxelPosition == newVoxel.voxelPosition)
+                    {
+                        if (gridPositions[j].voxelInPosition == false && newVoxel.voxelInPosition == true)
+                        {
+                            gridPositions.Remove(gridPositions[j]);
+                            gridPositions.Add(newVoxel);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                gridPositions.Add(newVoxel);
+            }
         }
-        return newList;
+        for (int i = 0; i < gridPositions.Count(); i++)
+        {
+            Debug.Log(gridPositions[i].voxelPosition);
+        }
     }
     #endregion
 
-    #region Grid Creation 
-    private void CreateGrid(int x, int y, int z, List<int>[] gridSeed)
+    #region Grid and Block Creation 
+    private void CreateGridAndBlocks()
     {
-        int currentFace = 0;
-        int currentPixel = 0;
-        float pixelSizeOffset = pixelSize / 2;
-        float xPositionStart = -x / 2 - pixelSizeOffset;
-        float yPositionStart = y / 2 + pixelSizeOffset;
-        float zPositionStart = pixelSizeOffset;
-        float xPosition = xPositionStart;
-        float yPosition = yPositionStart;
-        float zPosition = zPositionStart;
-        for (int i = 0; i < 2; i++)
+        float pixelSizeOffset = voxelSize / 2;
+        float xPositionStart = -(worldSize[0] + 1) / 2 - pixelSizeOffset;
+        float yPositionStart = (worldSize[1] + 2) / 2 + pixelSizeOffset;
+        float zPositionStart = pixelSizeOffset - 2;
+        float xPosition;
+        float yPosition;
+        float zPosition;
+        for (int i = 0; i < gridPositions.Count(); i++)
         {
-            for (int j = 0; j < y; j++)
+            if (gridPositions[i].voxelInPosition)
             {
-                for (int k = 0; k < x; k++)
-                {
-                    //if (gridSeed[currentFace][j * worldSize[0] + k] != 1) 
-                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
-                    xPosition += pixelSize;
-                    currentPixel += 1;
-                }
-                xPosition = xPositionStart;
-                yPosition -= pixelSize;
-            } //front face created 
-            xPosition = xPositionStart;
-            yPosition = yPositionStart;
-            zPosition += (z - 1) * pixelSize;
-            currentPixel = 0;
-            currentFace += 1;
-        } //back face created 
-        zPositionStart += pixelSize;
-        xPosition = xPositionStart;
-        yPosition = yPositionStart;
-        zPosition = zPositionStart;
-        for (int i = 0; i < 2; i++)
-        {
-            for (int j = 0; j < y; j++)
-            {
-                for (int k = 0; k < z - 2; k++)
-                {
-                    //if (gridSeed[currentFace][j * worldSize[2] + k] != 1) 
-                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
-                    zPosition += pixelSize;
-                    currentPixel += 1;
-                }
-                zPosition = zPositionStart;
-                yPosition -= pixelSize;
-            } //left face created 
-            zPosition = zPositionStart;
-            yPosition = yPositionStart;
-            xPosition += (x - 1) * pixelSize;
-            currentPixel = 0;
-            currentFace += 1;
-        } //right face created 
-        xPositionStart += pixelSize;
-        xPosition = xPositionStart;
-        yPosition = yPositionStart;
-        zPosition = zPositionStart;
-        for (int i = 0; i < 2; i++)
-        {
-            for (int j = 0; j < x - 2; j++)
-            {
-                for (int k = 0; k < z - 2; k++)
-                {
-                    //if (gridSeed[currentFace][j * worldSize[0] + k] != 1) 
-                    Instantiate(worldPixel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
-                    zPosition += pixelSize;
-                    currentPixel += 1;
-                }
-                zPosition = zPositionStart;
-                xPosition += pixelSize;
-            } //top face created 
-            zPosition = zPositionStart;
-            xPosition = xPositionStart;
-            yPosition -= (y - 1) * pixelSize;
-            currentPixel = 0;
-            currentFace += 1;
-        } //bottom face created 
-    }
-    #endregion
-    #region Block Creation
-    private void CreateBlocks(List<int>[] blockSeed)
-    {
-        for (int i = 0; i < blockSeed.Length; i++)
-        {
-            for (int j = 0; j < blockSeed[i].Count(); j++)
-            {
-                //Debug.Log(blockSeed[i][j]);
+                xPosition = xPositionStart + gridPositions[i].voxelPosition.x;
+                yPosition = yPositionStart + gridPositions[i].voxelPosition.y;
+                zPosition = zPositionStart + gridPositions[i].voxelPosition.z;
+                Instantiate(worldVoxel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
             }
+        }
+        for (int i = 0; i < blockPositions.Count(); i++)
+        {
+            xPosition = xPositionStart + blockPositions[i].voxelPosition.x;
+            yPosition = yPositionStart + blockPositions[i].voxelPosition.y;
+            zPosition = zPositionStart + blockPositions[i].voxelPosition.z;
+            //Instantiate(worldVoxel, new Vector3(xPosition, yPosition, zPosition), Quaternion.identity, parent: this.transform);
         }
     }
     #endregion
