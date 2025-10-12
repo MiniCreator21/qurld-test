@@ -2,15 +2,24 @@ using UnityEngine;
 
 public class WorldVoxel : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    #region Dependencies
+    #endregion
+    #region Public Fields
+    #endregion
+    #region Private Variables
+    #endregion
+
+    #region Start
     void Start()
     {
-        
     }
+    #endregion
+    #region Initialise
+    #endregion
 
-    // Update is called once per frame
+    #region Update
     void Update()
     {
-        
     }
+    #endregion
 }
