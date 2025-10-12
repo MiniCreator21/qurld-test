@@ -463,8 +463,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WorldHandler
   gridVoxel: {fileID: 4437631507824673, guid: c6db0162622e0144b8be690e96831418, type: 3}
   blockVoxel: {fileID: 4437631507824673, guid: abc414a00a586d2448f4967b800b9674, type: 3}
+  worldSize: 080000000800000008000000
   voxelSize: 1
   blockPositions: []
+  worldCreated: 0
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -523,10 +525,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1165491612}
+  - component: {fileID: 1165491613}
+  - component: {fileID: 1165491614}
   - component: {fileID: 1165491611}
   - component: {fileID: 1165491610}
   - component: {fileID: 1165491609}
-  - component: {fileID: 1165491613}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -639,6 +642,38 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   world: {fileID: 629266673}
+  playerState: 0
+  speed: 10
+--- !u!114 &1165491614
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1165491608}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62899f850307741f2a39c98a8b639597, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.PlayerInput
+  m_Actions: {fileID: -944628639613478452, guid: 17521ed054ea28a488dc8128bb7d94a0, type: 3}
+  m_NotificationBehavior: 0
+  m_UIInputModule: {fileID: 0}
+  m_DeviceLostEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_DeviceRegainedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ControlsChangedEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  m_ActionEvents: []
+  m_NeverAutoSwitchControlSchemes: 0
+  m_DefaultControlScheme: Keyboard&Mouse
+  m_DefaultActionMap: Player
+  m_SplitScreenIndex: -1
+  m_Camera: {fileID: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

@@ -78,14 +78,14 @@ public class WorldHandler : MonoBehaviour
             {
                 List<int> newFace = new List<int>
                 {
-                    0,1,0,0,0,0,0,0,
                     0,0,0,0,0,0,1,0,
+                    0,1,0,0,0,0,0,0,
                     0,0,0,0,0,0,0,0,
-                    0,0,0,0,0,1,0,0,
-                    0,0,0,0,0,0,0,1,
-                    0,0,0,0,1,0,0,0,
-                    0,0,1,0,1,0,0,0,
-                    1,0,1,0,1,0,0,0
+                    0,0,1,0,0,0,0,0,
+                    1,0,0,0,0,0,0,0,
+                    0,0,0,1,0,0,0,0,
+                    0,0,0,1,0,1,0,0,
+                    0,0,0,1,0,1,0,1
                 };
                 worldSeed[i] = newFace;
             }
@@ -170,11 +170,11 @@ public class WorldHandler : MonoBehaviour
     {
         gridPositions = new List<VoxelPosition>{};
         blockPositions = new List<VoxelPosition>{};
-        VoxelPosition newVoxel = new VoxelPosition { };
+        VoxelPosition newVoxel = new VoxelPosition{};
         float pixelSizeOffset = voxelSize / 2;
-        float xPositionStart = pixelSizeOffset - worldSize[0] / 2 - 1;
-        float yPositionStart = -pixelSizeOffset + worldSize[1] / 2 + 1;
-        float zPositionStart = pixelSizeOffset + worldSize[1] * 2f - worldSize[0] / 2 - 1;
+        float xPositionStart = pixelSizeOffset - (worldSize[0] / 2 + 1) * voxelSize;
+        float yPositionStart = -pixelSizeOffset + (worldSize[1] / 2 + 1) * voxelSize;
+        float zPositionStart = pixelSizeOffset + (worldSize[1] * 2f - worldSize[0] / 2 - 1) * voxelSize;
         for (int currentFace = 0; currentFace < worldSeed.Length; currentFace++)
         {
             if (currentFace == 0)
@@ -188,8 +188,8 @@ public class WorldHandler : MonoBehaviour
                     {
                         currentRow -= 1;
                     }
-                    newVoxel.voxelPosition.x = xPositionStart + currentColumn + 1;
-                    newVoxel.voxelPosition.y = yPositionStart + currentRow - 1;
+                    newVoxel.voxelPosition.x = xPositionStart + (currentColumn + 1) * voxelSize;
+                    newVoxel.voxelPosition.y = yPositionStart + (currentRow - 1) * voxelSize;
                     newVoxel.voxelPosition.z = zPositionStart;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
@@ -207,9 +207,9 @@ public class WorldHandler : MonoBehaviour
                     {
                         currentRow -= 1;
                     }
-                    newVoxel.voxelPosition.x = xPositionStart + currentColumn + 1;
-                    newVoxel.voxelPosition.y = yPositionStart + currentRow - 1;
-                    newVoxel.voxelPosition.z = zPositionStart + worldSize[2] + 1;
+                    newVoxel.voxelPosition.x = xPositionStart + (currentColumn + 1) * voxelSize;
+                    newVoxel.voxelPosition.y = yPositionStart + (currentRow - 1) * voxelSize;
+                    newVoxel.voxelPosition.z = zPositionStart + (worldSize[2] + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
                     blockPositions.Add(newVoxel);
@@ -227,8 +227,8 @@ public class WorldHandler : MonoBehaviour
                         currentRow -= 1;
                     }
                     newVoxel.voxelPosition.x = xPositionStart;
-                    newVoxel.voxelPosition.y = yPositionStart + currentRow - 1;
-                    newVoxel.voxelPosition.z = zPositionStart + currentColumn + 1;
+                    newVoxel.voxelPosition.y = yPositionStart + (currentRow - 1) * voxelSize;
+                    newVoxel.voxelPosition.z = zPositionStart + (currentColumn + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
                     blockPositions.Add(newVoxel);
@@ -245,9 +245,9 @@ public class WorldHandler : MonoBehaviour
                     {
                         currentRow -= 1;
                     }
-                    newVoxel.voxelPosition.x = xPositionStart + worldSize[0] + 1;
-                    newVoxel.voxelPosition.y = yPositionStart + currentRow - 1;
-                    newVoxel.voxelPosition.z = zPositionStart + currentColumn + 1;
+                    newVoxel.voxelPosition.x = xPositionStart + (worldSize[0] + 1) * voxelSize;
+                    newVoxel.voxelPosition.y = yPositionStart + (currentRow - 1) * voxelSize;
+                    newVoxel.voxelPosition.z = zPositionStart + (currentColumn + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
                     blockPositions.Add(newVoxel);
@@ -264,9 +264,9 @@ public class WorldHandler : MonoBehaviour
                     {
                         currentRow -= 1;
                     }
-                    newVoxel.voxelPosition.x = xPositionStart + currentColumn + 1;
+                    newVoxel.voxelPosition.x = xPositionStart + (currentColumn + 1) * voxelSize;
                     newVoxel.voxelPosition.y = yPositionStart;
-                    newVoxel.voxelPosition.z = zPositionStart + currentRow + 1;
+                    newVoxel.voxelPosition.z = zPositionStart + (currentRow + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
                     blockPositions.Add(newVoxel);
@@ -283,9 +283,9 @@ public class WorldHandler : MonoBehaviour
                     {
                         currentRow += 1;
                     }
-                    newVoxel.voxelPosition.x = xPositionStart + currentColumn + 1;
-                    newVoxel.voxelPosition.y = yPositionStart - worldSize[1] - 1;
-                    newVoxel.voxelPosition.z = zPositionStart + currentRow + 1;
+                    newVoxel.voxelPosition.x = xPositionStart + (currentColumn + 1) * voxelSize;
+                    newVoxel.voxelPosition.y = yPositionStart - (worldSize[1] + 1) * voxelSize;
+                    newVoxel.voxelPosition.z = zPositionStart + (currentRow + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
                     blockPositions.Add(newVoxel);
@@ -300,27 +300,27 @@ public class WorldHandler : MonoBehaviour
             else if (blockPositions[i].voxelInPosition) newVoxel.voxelInPosition = false;
             if (newVoxel.voxelPosition.x == xPositionStart)
             {
-                newVoxel.voxelPosition.x += 1;
+                newVoxel.voxelPosition.x += voxelSize;
             }
             else if (newVoxel.voxelPosition.x == xPositionStart + worldSize[0] + 1)
             {
-                newVoxel.voxelPosition.x -= 1;
+                newVoxel.voxelPosition.x -= voxelSize;
             }
             else if (newVoxel.voxelPosition.y == yPositionStart)
             {
-                newVoxel.voxelPosition.y -= 1;
+                newVoxel.voxelPosition.y -= voxelSize;
             }
             else if (newVoxel.voxelPosition.y == yPositionStart - worldSize[1] - 1)
             {
-                newVoxel.voxelPosition.y += 1;
+                newVoxel.voxelPosition.y += voxelSize;
             }
             else if (newVoxel.voxelPosition.z == zPositionStart)
             {
-                newVoxel.voxelPosition.z += 1;
+                newVoxel.voxelPosition.z += voxelSize;
             }
             else if (newVoxel.voxelPosition.z == zPositionStart + worldSize[2] + 1)
             {
-                newVoxel.voxelPosition.z -= 1;
+                newVoxel.voxelPosition.z -= voxelSize;
             }
             testVoxel = newVoxel;
             testVoxel.voxelInPosition = !testVoxel.voxelInPosition;
@@ -345,44 +345,156 @@ public class WorldHandler : MonoBehaviour
         }
         for (int i = 0; i < blockPositions.Count(); i++)
         {
-            if (blockPositions[i].voxelInPosition)
+            VoxelPosition testVoxel;
+            newVoxel = blockPositions[i];
+            if (blockPositions[i].voxelPosition.x == xPositionStart + voxelSize)
             {
-                newVoxel = blockPositions[i];
-                if (blockPositions[i].voxelPosition.x == xPositionStart + 1)
+                newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                newVoxel.voxelPosition.x -= voxelSize;
+                testVoxel = newVoxel;
+                testVoxel.voxelInPosition = !newVoxel.voxelInPosition;
+                if (blockPositions[i].voxelInPosition)
                 {
-                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
-                    newVoxel.voxelPosition.x -= 1;
+                    if (blockPositions.Contains(testVoxel))
+                    {
+                        for (int j = 0; j < blockPositions.Count; j++)
+                        {
+                            if (blockPositions[j].voxelPosition == testVoxel.voxelPosition)
+                            {
+                                blockPositions.Remove(blockPositions[j]);
+                            }
+                        }
+                    }
                     if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
                 }
-                if (blockPositions[i].voxelPosition.x == xPositionStart + worldSize[0])
+                else
                 {
-                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
-                    newVoxel.voxelPosition.x += 1;
+                    if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
+                }
+            }
+            if (blockPositions[i].voxelPosition.x == xPositionStart + worldSize[0])
+            {
+                newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                newVoxel.voxelPosition.x += voxelSize;
+                testVoxel = newVoxel;
+                testVoxel.voxelInPosition = !newVoxel.voxelInPosition;
+                if (blockPositions[i].voxelInPosition)
+                {
+                    if (blockPositions.Contains(testVoxel))
+                    {
+                        for (int j = 0; j < blockPositions.Count; j++)
+                        {
+                            if (blockPositions[j].voxelPosition == testVoxel.voxelPosition)
+                            {
+                                blockPositions.Remove(blockPositions[j]);
+                            }
+                        }
+                    }
                     if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
                 }
-                if (blockPositions[i].voxelPosition.y == yPositionStart - 1)
+                else
                 {
-                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
-                    newVoxel.voxelPosition.y += 1;
+                    if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
+                }
+            }
+            if (blockPositions[i].voxelPosition.y == yPositionStart - voxelSize)
+            {
+                newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                newVoxel.voxelPosition.y += voxelSize;
+                testVoxel = newVoxel;
+                testVoxel.voxelInPosition = !newVoxel.voxelInPosition;
+                if (blockPositions[i].voxelInPosition)
+                {
+                    if (blockPositions.Contains(testVoxel))
+                    {
+                        for (int j = 0; j < blockPositions.Count; j++)
+                        {
+                            if (blockPositions[j].voxelPosition == testVoxel.voxelPosition)
+                            {
+                                blockPositions.Remove(blockPositions[j]);
+                            }
+                        }
+                    }
                     if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
                 }
-                if (blockPositions[i].voxelPosition.y == yPositionStart - worldSize[1])
+                else
                 {
-                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
-                    newVoxel.voxelPosition.y -= 1;
+                    if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
+                }
+            }
+            if (blockPositions[i].voxelPosition.y == yPositionStart - worldSize[1])
+            {
+                newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                newVoxel.voxelPosition.y -= voxelSize;
+                testVoxel = newVoxel;
+                testVoxel.voxelInPosition = !newVoxel.voxelInPosition;
+                if (blockPositions[i].voxelInPosition)
+                {
+                    if (blockPositions.Contains(testVoxel))
+                    {
+                        for (int j = 0; j < blockPositions.Count; j++)
+                        {
+                            if (blockPositions[j].voxelPosition == testVoxel.voxelPosition)
+                            {
+                                blockPositions.Remove(blockPositions[j]);
+                            }
+                        }
+                    }
                     if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
                 }
-                if (blockPositions[i].voxelPosition.z == zPositionStart + 1)
+                else
                 {
-                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
-                    newVoxel.voxelPosition.z -= 1;
+                    if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
+                }
+            }
+            if (blockPositions[i].voxelPosition.z == zPositionStart + 1)
+            {
+                newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                newVoxel.voxelPosition.z -= voxelSize;
+                testVoxel = newVoxel;
+                testVoxel.voxelInPosition = !newVoxel.voxelInPosition;
+                if (blockPositions[i].voxelInPosition)
+                {
+                    if (blockPositions.Contains(testVoxel))
+                    {
+                        for (int j = 0; j < blockPositions.Count; j++)
+                        {
+                            if (blockPositions[j].voxelPosition == testVoxel.voxelPosition)
+                            {
+                                blockPositions.Remove(blockPositions[j]);
+                            }
+                        }
+                    }
                     if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
                 }
-                if (blockPositions[i].voxelPosition.z == zPositionStart + worldSize[2])
+                else
                 {
-                    newVoxel.voxelPosition = blockPositions[i].voxelPosition;
-                    newVoxel.voxelPosition.z += 1;
+                    if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
+                }
+            }
+            if (blockPositions[i].voxelPosition.z == zPositionStart + worldSize[2])
+            {
+                newVoxel.voxelPosition = blockPositions[i].voxelPosition;
+                newVoxel.voxelPosition.z += voxelSize;
+                testVoxel = newVoxel;
+                testVoxel.voxelInPosition = !newVoxel.voxelInPosition;
+                if (blockPositions[i].voxelInPosition)
+                {
+                    if (blockPositions.Contains(testVoxel))
+                    {
+                        for (int j = 0; j < blockPositions.Count; j++)
+                        {
+                            if (blockPositions[j].voxelPosition == testVoxel.voxelPosition)
+                            {
+                                blockPositions.Remove(blockPositions[j]);
+                            }
+                        }
+                    }
                     if (!blockPositions.Contains(newVoxel)) blockPositions.Add(newVoxel);
+                }
+                else
+                {
+                    if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
                 }
             }
         }
