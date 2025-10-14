@@ -1,8 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using JetBrains.Annotations;
-using NUnit.Framework.Internal;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
@@ -174,7 +172,7 @@ public class WorldHandler : MonoBehaviour
         float pixelSizeOffset = voxelSize / 2;
         float xPositionStart = pixelSizeOffset - (worldSize[0] / 2 + 1) * voxelSize;
         float yPositionStart = -pixelSizeOffset + (worldSize[1] / 2 + 1) * voxelSize;
-        float zPositionStart = pixelSizeOffset + (worldSize[1] * 2f - worldSize[0] / 2 - 1) * voxelSize;
+        float zPositionStart = pixelSizeOffset - (worldSize[2] / 2 + 1) * voxelSize;
         for (int currentFace = 0; currentFace < worldSeed.Length; currentFace++)
         {
             if (currentFace == 0)

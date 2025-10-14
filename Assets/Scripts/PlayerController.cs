@@ -1,15 +1,19 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 using UnityEngine.InputSystem.Controls;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class PlayerController : MonoBehaviour
 {
     #region Dependencies
     [SerializeField] WorldHandler world;
+    [SerializeField] new CameraController camera;
     #endregion
     #region Public Fields
     #endregion
@@ -17,7 +21,7 @@ public class PlayerController : MonoBehaviour
     private int[] worldSize;
     private float voxelSize;
     private bool initialised = false;
-    enum PlayerState { Stationary, Moving }
+    enum PlayerState { Stationary, Moving, SwitchingSides }
     [SerializeField] private PlayerState playerState = PlayerState.Stationary;
     private Vector3 currentPosition;
     private int currentFace = 0;
@@ -94,6 +98,7 @@ public class PlayerController : MonoBehaviour
             InitialiseSnap();
             InitialiseSize();
             InitialisePosition();
+            camera.InitialiseCameraPosition(worldSize[2], movementInstructions[currentFace].toGrid);
             initialised = true;
         }
     }
@@ -111,7 +116,7 @@ public class PlayerController : MonoBehaviour
     {
         worldSize = world.worldSize;
         float pixelSizeOffset = voxelSize / 2;
-        float zPositionStart = pixelSizeOffset + (worldSize[1] * 2f - worldSize[0] / 2 - 1) * voxelSize;
+        float zPositionStart = pixelSizeOffset - (worldSize[2] / 2 + 1) * voxelSize;
         Vector3 closestBlockToCentre;
         closestBlockToCentre.x = 9999;
         closestBlockToCentre.y = 9999;
@@ -163,11 +168,20 @@ public class PlayerController : MonoBehaviour
                 transform.position += direction * speed * Time.deltaTime;
                 CheckForDestination();
                 break;
+            case PlayerState.SwitchingSides:
+                //do something
+                break;
         }
     }
     #endregion
 
     #region Movement
+    //just spaces to be able to see :)
+    //yep
+    //just a tad more 
+    //uh huh
+    //done :)
+    #region Movement Input
     public void OnMoveLeft()
     {
         if (playerState != PlayerState.Moving) Move(Vector2.left);
@@ -204,21 +218,26 @@ public class PlayerController : MonoBehaviour
         }
         spacesMoving = CheckLine(direction);
         if (spacesMoving == 0) direction = Vector3.zero;
-        else if (spacesMoving != 0)
+        else if (spacesMoving > 0)
         {
             playerState = PlayerState.Moving;
         }
     }
+    #endregion
 
+    #region Movement Checks 
     private void CheckForDestination()
     {
         Vector3 vectorToDestination = currentPosition + direction * spacesMoving * voxelSize - transform.position + movementInstructions[currentFace].toGrid * 0.1f;
         float distanceToDestination = math.pow(vectorToDestination.x, 2) + math.pow(vectorToDestination.y, 2) + math.pow(vectorToDestination.z, 2);
         if (Mathf.Abs(distanceToDestination) < snapDistance)
         {
-            playerState = PlayerState.Stationary;
             currentPosition = currentPosition + direction * spacesMoving * voxelSize;
             transform.position = currentPosition + movementInstructions[currentFace].toGrid * 0.1f;
+            direction = Vector3.zero;
+            spacesMoving = 0;
+            bool switchSides = CheckForSideSwitch();
+            if (!switchSides) playerState = PlayerState.Stationary;
         }
     }
 
@@ -373,8 +392,11 @@ public class PlayerController : MonoBehaviour
         return spaces;
     }
     #endregion
-    private void theseareedges()
+
+    #region Side Switch Checking
+    private bool CheckForSideSwitch()
     {
+        bool switchSides = false;
         float pixelSizeOffset = voxelSize / 2;
         float xEdge1 = pixelSizeOffset - (worldSize[0] / 2 + 1) * voxelSize;
         float xEdge2 = xEdge1 + (worldSize[0] + 1) * voxelSize;
@@ -382,5 +404,8 @@ public class PlayerController : MonoBehaviour
         float yEdge2 = yEdge1 - (worldSize[1] + 1) * voxelSize;
         float zEdge1 = pixelSizeOffset + (worldSize[1] * 2f - worldSize[0] / 2 - 1) * voxelSize;
         float zEdge2 = zEdge1 + (worldSize[2] + 1) * voxelSize;
+        return switchSides;
     }
+    #endregion
+    #endregion
 }
