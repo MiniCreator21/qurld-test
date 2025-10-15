@@ -16,6 +16,7 @@ public class CameraController : MonoBehaviour
     new CinemachineCamera camera;
     #endregion
     #region Public Fields
+    public bool faceSwitched = false;
     #endregion
     #region Private Variables
     #endregion
@@ -41,20 +42,21 @@ public class CameraController : MonoBehaviour
     #endregion
 
     #region Switching Faces
-    public void SwitchFace(int worldDepth, Vector3 vectorToGrid)
+    public void SwitchFace(int worldDepth, int currentFace, int lastFace, Vector3 vectorToGrid)
     {
-        Vector3 positionToSwitchTo = Vector3.zero;
+        Vector3 positionToSwitchTo;
         Vector3 rotationToSwitchTo = Vector3.zero;
         positionToSwitchTo = vectorToGrid * -1 * worldDepth * 10;
         transform.position = positionToSwitchTo; //                <- smooth out position switching 
         camera.Lens.FieldOfView = worldDepth + worldDepth / 4;
-        if (vectorToGrid.z > 0) rotationToSwitchTo = Vector3.zero;
-        else if (vectorToGrid.z < 0) rotationToSwitchTo = Vector3.down * 180;
-        else if (vectorToGrid.x < 0) rotationToSwitchTo = Vector3.down * 90;
-        else if (vectorToGrid.x > 0) rotationToSwitchTo = Vector3.up * 90;
-        else if (vectorToGrid.y < 0) rotationToSwitchTo = Vector3.right * 90;
-        else if (vectorToGrid.y > 0) rotationToSwitchTo = Vector3.left * 90;
+        if (currentFace == 0) rotationToSwitchTo = Vector3.zero;
+        else if (currentFace == 1) rotationToSwitchTo = Vector3.down * 180;
+        else if (currentFace == 2) rotationToSwitchTo = Vector3.up * 90;
+        else if (currentFace == 3) rotationToSwitchTo = Vector3.down * 90;
+        else if (currentFace == 4) rotationToSwitchTo = Vector3.right * 90;
+        else if (currentFace == 5) rotationToSwitchTo = Vector3.left * 90;
         transform.localEulerAngles = rotationToSwitchTo; //            <- smooth out rotation 
+        faceSwitched = true;
     }
     #endregion
 }
