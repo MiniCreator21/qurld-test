@@ -42,7 +42,7 @@ public class PlayerController : MonoBehaviour
     #region Initialise
     private void InitialiseMovementInstructions()
     {
-        movementInstructions = new UnityEngine.Vector3[6, 5];
+        movementInstructions = new Vector3[6, 5];
         movementInstructions[0,0] = Vector3.up;
         movementInstructions[0,1] = Vector3.right;
         movementInstructions[0,2] = Vector3.down;
@@ -68,10 +68,10 @@ public class PlayerController : MonoBehaviour
         movementInstructions[4,2] = Vector3.back;
         movementInstructions[4,3] = Vector3.left;
         movementInstructions[4,4] = Vector3.down;
-        movementInstructions[5,0] = Vector3.back;
-        movementInstructions[5,1] = Vector3.right;
-        movementInstructions[5,2] = Vector3.forward;
-        movementInstructions[5,3] = Vector3.left;
+        movementInstructions[5,0] = Vector3.forward;
+        movementInstructions[5,1] = Vector3.left;
+        movementInstructions[5,2] = Vector3.back;
+        movementInstructions[5,3] = Vector3.right;
         movementInstructions[5,4] = Vector3.up;
     }
     private void CheckToInitialise()
@@ -154,14 +154,10 @@ public class PlayerController : MonoBehaviour
                 CheckForDestination();
                 break;
             case PlayerState.SwitchingFaces:
-                if (camera.rotationDone)
-                {
-                    camera.rotationDone = false;
-                    Move();
-                }
                 if (camera.faceSwitched)
                 {
                     camera.faceSwitched = false;
+                    Move();
                 }
                 break;
         }
@@ -211,28 +207,20 @@ public class PlayerController : MonoBehaviour
     {
         if (direction2D == Vector2.zero) return;
         int rotation = 0;
+        Vector3 cameraRotation = camera.transform.eulerAngles;
+        //if (cameraRotation.x < 0) cameraRotation.x += 360;
+        //if (cameraRotation.y < 0) cameraRotation.y += 360;
+        //if (cameraRotation.z < 0) cameraRotation.z += 360;
+        //if (cameraRotation.x >= 360) cameraRotation.x -= 360;
+        //if (cameraRotation.y >= 360) cameraRotation.y -= 360;
+        //if (cameraRotation.z >= 360) cameraRotation.z -= 360;
+        Debug.Log(cameraRotation);
         for (int i = 0; i < 4; i++)
         {
-            if (currentFace >= 0 && currentFace <= 3)
+            if (cameraRotation.z == i * 90)
             {
-                if (camera.transform.rotation.z == i * 90)
-                {
-                    rotation = i;
-                }
-            }
-            else if (currentFace == 4)
-            {
-                if (camera.transform.rotation.y == -(i * 90))
-                {
-                    rotation = i;
-                }
-            }
-            else if (currentFace == 5)
-            {
-                if (camera.transform.rotation.y == i * 90)
-                {
-                    rotation = i;
-                }
+                rotation = i;
+                Debug.Log("rotation = " + i);
             }
         }
         if (direction2D == Vector2.up)
@@ -439,6 +427,7 @@ public class PlayerController : MonoBehaviour
     private bool CheckForFaceSwitch()
     {
         bool switchFaces = false;
+        int lastFace = 0;
         float pixelSizeOffset = voxelSize / 2;
         float xEdge1 = pixelSizeOffset - (worldSize.x / 2 + 1) * voxelSize;
         float xEdge2 = xEdge1 + (worldSize.x + 1) * voxelSize;
@@ -448,7 +437,7 @@ public class PlayerController : MonoBehaviour
         float zEdge2 = zEdge1 + (worldSize.z + 1) * voxelSize;
         if (currentPosition.x == xEdge1 && currentPosition.z == zEdge1 || currentPosition.x == xEdge2 && currentPosition.z == zEdge1 || currentPosition.y == yEdge1 && currentPosition.z == zEdge1 || currentPosition.y == yEdge2 && currentPosition.z == zEdge1 || currentPosition.x == xEdge1 && currentPosition.z == zEdge2 || currentPosition.x == xEdge2 && currentPosition.z == zEdge2 || currentPosition.y == yEdge1 && currentPosition.z == zEdge2 || currentPosition.y == yEdge2 && currentPosition.z == zEdge2 || currentPosition.x == xEdge1 && currentPosition.y == yEdge1 || currentPosition.x == xEdge2 && currentPosition.y == yEdge1 || currentPosition.x == xEdge1 && currentPosition.y == yEdge2 || currentPosition.x == xEdge2 && currentPosition.y == yEdge2)
         {
-            camera.RotateCameraForSwitch(direction);
+            lastFace = currentFace;
             if (currentFace == 0)
             {
                 if (direction == Vector3.left) currentFace = 2;
@@ -493,7 +482,7 @@ public class PlayerController : MonoBehaviour
             }
             playerState = PlayerState.SwitchingFaces;
             switchFaces = true;
-            camera.SwitchFace(worldSize);
+            camera.SwitchFace(direction2D);
             transform.position = currentPosition + movementInstructions[currentFace,4] * 0.1f;
         }
         return switchFaces;

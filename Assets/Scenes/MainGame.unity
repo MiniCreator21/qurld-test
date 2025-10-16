@@ -464,8 +464,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0737c168c1dea5043aeeae08031e090c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
+  world: {fileID: 629266673}
   player: {fileID: 1165491613}
-  rotationDone: 0
   faceSwitched: 0
 --- !u!1 &629266671
 GameObject:
