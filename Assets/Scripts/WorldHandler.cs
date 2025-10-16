@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using UnityEditor.Experimental.GraphView;
 using UnityEngine;
+using Vector2 = UnityEngine.Vector2;
+using Vector3 = UnityEngine.Vector3;
 
 public class WorldHandler : MonoBehaviour
 {
@@ -11,7 +11,7 @@ public class WorldHandler : MonoBehaviour
     [SerializeField] private GameObject blockVoxel;
     #endregion
     #region Public Fields
-    public int[] worldSize = { 8, 8, 8 };
+    public Vector3 worldSize;
     public float voxelSize = 1f;
     public List<VoxelPosition> blockPositions;
     public bool worldCreated = false;
@@ -33,8 +33,9 @@ public class WorldHandler : MonoBehaviour
     #region Start
     void Start()
     {
+        worldSize = Vector3.one * 8;
         UpdateDependencies();
-        CreateSeed(worldSize[0], worldSize[1], worldSize[2]);
+        CreateSeed(worldSize);
         CreateWorld();
     }
     #endregion
@@ -52,7 +53,7 @@ public class WorldHandler : MonoBehaviour
     #endregion
 
     #region Seed Creation
-    private void CreateSeed(int xSize, int ySize, int zSize)
+    private void CreateSeed(Vector3 worldSize)
     {
         worldSeed = new List<int>[6];
         for (int i = 0; i < 2; i++) //iterates through front and back sides of cube 
@@ -170,18 +171,18 @@ public class WorldHandler : MonoBehaviour
         blockPositions = new List<VoxelPosition>{};
         VoxelPosition newVoxel = new VoxelPosition{};
         float pixelSizeOffset = voxelSize / 2;
-        float xPositionStart = pixelSizeOffset - (worldSize[0] / 2 + 1) * voxelSize;
-        float yPositionStart = -pixelSizeOffset + (worldSize[1] / 2 + 1) * voxelSize;
-        float zPositionStart = pixelSizeOffset - (worldSize[2] / 2 + 1) * voxelSize;
+        float xPositionStart = pixelSizeOffset - (worldSize.x / 2 + 1) * voxelSize;
+        float yPositionStart = -pixelSizeOffset + (worldSize.y / 2 + 1) * voxelSize;
+        float zPositionStart = pixelSizeOffset - (worldSize.z / 2 + 1) * voxelSize;
         for (int currentFace = 0; currentFace < worldSeed.Length; currentFace++)
         {
             if (currentFace == 0)
             {
                 int currentRow = 1;
                 int currentColumn;
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                for (int i = 0; i < worldSeed[currentFace].Count; i++)
                 {
-                    currentColumn = i % worldSize[0];
+                    currentColumn = i % (int)worldSize.x;
                     if (currentColumn == 0)
                     {
                         currentRow -= 1;
@@ -198,16 +199,16 @@ public class WorldHandler : MonoBehaviour
             {
                 int currentRow = 1;
                 int currentColumn;
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                for (int i = 0; i < worldSeed[currentFace].Count; i++)
                 {
-                    currentColumn = worldSize[0] - 1 - i % worldSize[0];
-                    if (currentColumn == worldSize[0] - 1)
+                    currentColumn = (int)worldSize.x - 1 - i % (int)worldSize.x;
+                    if (currentColumn == worldSize.x - 1)
                     {
                         currentRow -= 1;
                     }
                     newVoxel.voxelPosition.x = xPositionStart + (currentColumn + 1) * voxelSize;
                     newVoxel.voxelPosition.y = yPositionStart + (currentRow - 1) * voxelSize;
-                    newVoxel.voxelPosition.z = zPositionStart + (worldSize[2] + 1) * voxelSize;
+                    newVoxel.voxelPosition.z = zPositionStart + (worldSize.z + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
                     blockPositions.Add(newVoxel);
@@ -217,10 +218,10 @@ public class WorldHandler : MonoBehaviour
             {
                 int currentRow = 1;
                 int currentColumn;
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                for (int i = 0; i < worldSeed[currentFace].Count; i++)
                 {
-                    currentColumn = worldSize[2] - 1 - i % worldSize[2];
-                    if (currentColumn == worldSize[2] - 1)
+                    currentColumn = (int)worldSize.z - 1 - i % (int)worldSize.z;
+                    if (currentColumn == worldSize.z - 1)
                     {
                         currentRow -= 1;
                     }
@@ -236,14 +237,14 @@ public class WorldHandler : MonoBehaviour
             {
                 int currentRow = 1;
                 int currentColumn;
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                for (int i = 0; i < worldSeed[currentFace].Count; i++)
                 {
-                    currentColumn = i % worldSize[2];
+                    currentColumn = i % (int)worldSize.z;
                     if (currentColumn == 0)
                     {
                         currentRow -= 1;
                     }
-                    newVoxel.voxelPosition.x = xPositionStart + (worldSize[0] + 1) * voxelSize;
+                    newVoxel.voxelPosition.x = xPositionStart + (worldSize.x + 1) * voxelSize;
                     newVoxel.voxelPosition.y = yPositionStart + (currentRow - 1) * voxelSize;
                     newVoxel.voxelPosition.z = zPositionStart + (currentColumn + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
@@ -253,11 +254,11 @@ public class WorldHandler : MonoBehaviour
             }
             else if (currentFace == 4)
             {
-                int currentRow = worldSize[2];
+                int currentRow = (int)worldSize.z;
                 int currentColumn;
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                for (int i = 0; i < worldSeed[currentFace].Count; i++)
                 {
-                    currentColumn = i % worldSize[0];
+                    currentColumn = i % (int)worldSize.x;
                     if (currentColumn == 0)
                     {
                         currentRow -= 1;
@@ -274,15 +275,15 @@ public class WorldHandler : MonoBehaviour
             {
                 int currentRow = -1;
                 int currentColumn;
-                for (int i = 0; i < worldSeed[currentFace].Count(); i++)
+                for (int i = 0; i < worldSeed[currentFace].Count; i++)
                 {
-                    currentColumn = i % worldSize[0];
+                    currentColumn = i % (int)worldSize.x;
                     if (currentColumn == 0)
                     {
                         currentRow += 1;
                     }
                     newVoxel.voxelPosition.x = xPositionStart + (currentColumn + 1) * voxelSize;
-                    newVoxel.voxelPosition.y = yPositionStart - (worldSize[1] + 1) * voxelSize;
+                    newVoxel.voxelPosition.y = yPositionStart - (worldSize.y + 1) * voxelSize;
                     newVoxel.voxelPosition.z = zPositionStart + (currentRow + 1) * voxelSize;
                     if (worldSeed[currentFace][i] == 1) newVoxel.voxelInPosition = true;
                     if (worldSeed[currentFace][i] == 0) newVoxel.voxelInPosition = false;
@@ -290,7 +291,7 @@ public class WorldHandler : MonoBehaviour
                 }
             }
         }
-        for (int i = 0; i < blockPositions.Count(); i++)
+        for (int i = 0; i < blockPositions.Count; i++)
         {
             VoxelPosition testVoxel;
             newVoxel.voxelPosition = blockPositions[i].voxelPosition;
@@ -300,7 +301,7 @@ public class WorldHandler : MonoBehaviour
             {
                 newVoxel.voxelPosition.x += voxelSize;
             }
-            else if (newVoxel.voxelPosition.x == xPositionStart + worldSize[0] + 1)
+            else if (newVoxel.voxelPosition.x == xPositionStart + worldSize.x + 1)
             {
                 newVoxel.voxelPosition.x -= voxelSize;
             }
@@ -308,7 +309,7 @@ public class WorldHandler : MonoBehaviour
             {
                 newVoxel.voxelPosition.y -= voxelSize;
             }
-            else if (newVoxel.voxelPosition.y == yPositionStart - worldSize[1] - 1)
+            else if (newVoxel.voxelPosition.y == yPositionStart - worldSize.y - 1)
             {
                 newVoxel.voxelPosition.y += voxelSize;
             }
@@ -316,7 +317,7 @@ public class WorldHandler : MonoBehaviour
             {
                 newVoxel.voxelPosition.z += voxelSize;
             }
-            else if (newVoxel.voxelPosition.z == zPositionStart + worldSize[2] + 1)
+            else if (newVoxel.voxelPosition.z == zPositionStart + worldSize.z + 1)
             {
                 newVoxel.voxelPosition.z -= voxelSize;
             }
@@ -324,7 +325,7 @@ public class WorldHandler : MonoBehaviour
             testVoxel.voxelInPosition = !testVoxel.voxelInPosition;
             if (gridPositions.Contains(newVoxel) || gridPositions.Contains(testVoxel)) 
             {
-                for (int j = 0; j < gridPositions.Count(); j++)
+                for (int j = 0; j < gridPositions.Count; j++)
                 {
                     if (gridPositions[j].voxelPosition == newVoxel.voxelPosition)
                     {
@@ -341,7 +342,7 @@ public class WorldHandler : MonoBehaviour
                 gridPositions.Add(newVoxel);
             }
         }
-        for (int i = 0; i < blockPositions.Count(); i++)
+        for (int i = 0; i < blockPositions.Count; i++)
         {
             VoxelPosition testVoxel;
             newVoxel = blockPositions[i];
@@ -370,7 +371,7 @@ public class WorldHandler : MonoBehaviour
                     if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
                 }
             }
-            if (blockPositions[i].voxelPosition.x == xPositionStart + worldSize[0])
+            if (blockPositions[i].voxelPosition.x == xPositionStart + worldSize.x)
             {
                 newVoxel.voxelPosition = blockPositions[i].voxelPosition;
                 newVoxel.voxelPosition.x += voxelSize;
@@ -420,7 +421,7 @@ public class WorldHandler : MonoBehaviour
                     if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
                 }
             }
-            if (blockPositions[i].voxelPosition.y == yPositionStart - worldSize[1])
+            if (blockPositions[i].voxelPosition.y == yPositionStart - worldSize.y)
             {
                 newVoxel.voxelPosition = blockPositions[i].voxelPosition;
                 newVoxel.voxelPosition.y -= voxelSize;
@@ -470,7 +471,7 @@ public class WorldHandler : MonoBehaviour
                     if (!blockPositions.Contains(testVoxel)) blockPositions.Add(newVoxel);
                 }
             }
-            if (blockPositions[i].voxelPosition.z == zPositionStart + worldSize[2])
+            if (blockPositions[i].voxelPosition.z == zPositionStart + worldSize.z)
             {
                 newVoxel.voxelPosition = blockPositions[i].voxelPosition;
                 newVoxel.voxelPosition.z += voxelSize;
@@ -506,7 +507,7 @@ public class WorldHandler : MonoBehaviour
         float xPosition;
         float yPosition;
         float zPosition;
-        for (int i = 0; i < gridPositions.Count(); i++)
+        for (int i = 0; i < gridPositions.Count; i++)
         {
             if (gridPositions[i].voxelInPosition)
             {
@@ -518,7 +519,7 @@ public class WorldHandler : MonoBehaviour
                 if (worldVoxel.GetComponent<WorldVoxel>() != null) GridVoxels.Add(worldVoxel.GetComponent<WorldVoxel>());
             }
         }
-        for (int i = 0; i < blockPositions.Count(); i++)
+        for (int i = 0; i < blockPositions.Count; i++)
         {
             if (blockPositions[i].voxelInPosition)
             {

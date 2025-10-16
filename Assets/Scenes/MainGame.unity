@@ -464,7 +464,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0737c168c1dea5043aeeae08031e090c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraController
-  player: {fileID: 1165491608}
+  player: {fileID: 1165491613}
+  rotationDone: 0
+  faceSwitched: 0
 --- !u!1 &629266671
 GameObject:
   m_ObjectHideFlags: 0
@@ -511,7 +513,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WorldHandler
   gridVoxel: {fileID: 4437631507824673, guid: c6db0162622e0144b8be690e96831418, type: 3}
   blockVoxel: {fileID: 4437631507824673, guid: abc414a00a586d2448f4967b800b9674, type: 3}
-  worldSize: 080000000800000008000000
+  worldSize: {x: 0, y: 0, z: 0}
   voxelSize: 1
   blockPositions: []
   worldCreated: 0
@@ -767,6 +769,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PlayerController
   world: {fileID: 629266673}
   camera: {fileID: 531618188}
+  currentFace: 0
   playerState: 0
   speed: 10
 --- !u!114 &1165491614

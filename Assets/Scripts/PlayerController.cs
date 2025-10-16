@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor.Experimental.GraphView;
@@ -8,6 +7,7 @@ using UnityEngine;
 using UnityEngine.InputSystem.Controls;
 using Vector2 = UnityEngine.Vector2;
 using Vector3 = UnityEngine.Vector3;
+using Debug = UnityEngine.Debug;
 
 public class PlayerController : MonoBehaviour
 {
@@ -16,32 +16,21 @@ public class PlayerController : MonoBehaviour
     [SerializeField] new CameraController camera;
     #endregion
     #region Public Fields
+    public Vector3[,] movementInstructions;
+    public int currentFace = 0;
     #endregion
     #region Private Variables
-    private int[] worldSize;
+    private Vector3 worldSize;
     private float voxelSize;
     private bool initialised = false;
     enum PlayerState { Stationary, Moving, SwitchingFaces }
     [SerializeField] private PlayerState playerState = PlayerState.Stationary;
     private Vector3 currentPosition;
-    private int currentFace = 0;
+    private Vector2 direction2D = Vector2.zero;
     private Vector3 direction = Vector3.zero;
     private int spacesMoving = 0;
     [SerializeField] private float speed = 10f;
     private float snapDistance = 0.01f;
-    private int lastFace = 0;
-    private MovementInstruction[] movementInstructions;
-    #endregion
-    #region Movement Instructions Struct
-    [System.Serializable]
-    public struct MovementInstruction
-    {
-        public Vector3 left;
-        public Vector3 right;
-        public Vector3 up;
-        public Vector3 down;
-        public Vector3 toGrid;
-    }
     #endregion
 
     #region Start
@@ -53,44 +42,37 @@ public class PlayerController : MonoBehaviour
     #region Initialise
     private void InitialiseMovementInstructions()
     {
-        movementInstructions = new MovementInstruction[6];
-        MovementInstruction newInstruction = new(){};
-        newInstruction.left = Vector3.left;
-        newInstruction.right = Vector3.right;
-        newInstruction.up = Vector3.up;
-        newInstruction.down = Vector3.down;
-        newInstruction.toGrid = Vector3.forward;
-        movementInstructions[0] = newInstruction;
-        newInstruction.left = Vector3.right;
-        newInstruction.right = Vector3.left;
-        newInstruction.up = Vector3.up;
-        newInstruction.down = Vector3.down;
-        newInstruction.toGrid = Vector3.back;
-        movementInstructions[1] = newInstruction;
-        newInstruction.left = Vector3.forward;
-        newInstruction.right = Vector3.back;
-        newInstruction.up = Vector3.up;
-        newInstruction.down = Vector3.down;
-        newInstruction.toGrid = Vector3.right;
-        movementInstructions[2] = newInstruction;
-        newInstruction.left = Vector3.back;
-        newInstruction.right = Vector3.forward;
-        newInstruction.up = Vector3.up;
-        newInstruction.down = Vector3.down;
-        newInstruction.toGrid = Vector3.left;
-        movementInstructions[3] = newInstruction;
-        newInstruction.left = Vector3.left;
-        newInstruction.right = Vector3.right;
-        newInstruction.up = Vector3.forward;
-        newInstruction.down = Vector3.back;
-        newInstruction.toGrid = Vector3.down;
-        movementInstructions[4] = newInstruction;
-        newInstruction.left = Vector3.left;
-        newInstruction.right = Vector3.right;
-        newInstruction.up = Vector3.back;
-        newInstruction.down = Vector3.forward;
-        newInstruction.toGrid = Vector3.up;
-        movementInstructions[5] = newInstruction;
+        movementInstructions = new UnityEngine.Vector3[6, 5];
+        movementInstructions[0,0] = Vector3.up;
+        movementInstructions[0,1] = Vector3.right;
+        movementInstructions[0,2] = Vector3.down;
+        movementInstructions[0,3] = Vector3.left;
+        movementInstructions[0,4] = Vector3.forward;
+        movementInstructions[1,0] = Vector3.up;
+        movementInstructions[1,1] = Vector3.left;
+        movementInstructions[1,2] = Vector3.down;
+        movementInstructions[1,3] = Vector3.right;
+        movementInstructions[1,4] = Vector3.back;
+        movementInstructions[2,0] = Vector3.up;
+        movementInstructions[2,1] = Vector3.back;
+        movementInstructions[2,2] = Vector3.down;
+        movementInstructions[2,3] = Vector3.forward;
+        movementInstructions[2,4] = Vector3.right;
+        movementInstructions[3,0] = Vector3.up;
+        movementInstructions[3,1] = Vector3.forward;
+        movementInstructions[3,2] = Vector3.down;
+        movementInstructions[3,3] = Vector3.back;
+        movementInstructions[3,4] = Vector3.left;
+        movementInstructions[4,0] = Vector3.forward;
+        movementInstructions[4,1] = Vector3.right;
+        movementInstructions[4,2] = Vector3.back;
+        movementInstructions[4,3] = Vector3.left;
+        movementInstructions[4,4] = Vector3.down;
+        movementInstructions[5,0] = Vector3.back;
+        movementInstructions[5,1] = Vector3.right;
+        movementInstructions[5,2] = Vector3.forward;
+        movementInstructions[5,3] = Vector3.left;
+        movementInstructions[5,4] = Vector3.up;
     }
     private void CheckToInitialise()
     {
@@ -99,7 +81,7 @@ public class PlayerController : MonoBehaviour
             InitialiseSnap();
             InitialiseSize();
             InitialisePosition();
-            camera.InitialiseCameraPosition(worldSize[2], movementInstructions[currentFace].toGrid);
+            camera.InitialiseCameraPosition(movementInstructions[currentFace,4], (int)worldSize.z);
             initialised = true;
         }
     }
@@ -117,7 +99,7 @@ public class PlayerController : MonoBehaviour
     {
         worldSize = world.worldSize;
         float pixelSizeOffset = voxelSize / 2;
-        float zPositionStart = pixelSizeOffset - (worldSize[2] / 2 + 1) * voxelSize;
+        float zPositionStart = pixelSizeOffset - (worldSize.z / 2 + 1) * voxelSize;
         Vector3 closestBlockToCentre;
         closestBlockToCentre.x = 9999;
         closestBlockToCentre.y = 9999;
@@ -145,7 +127,7 @@ public class PlayerController : MonoBehaviour
             }
         }
         currentFace = 0;
-        transform.position = currentPosition + movementInstructions[currentFace].toGrid * 0.1f;
+        transform.position = currentPosition + movementInstructions[currentFace,4] * 0.1f;
     }
     #endregion
 
@@ -163,6 +145,8 @@ public class PlayerController : MonoBehaviour
         switch (playerState)
         {
             case PlayerState.Stationary:
+                direction2D = Vector2.zero;
+                direction = Vector3.zero;
                 break;
 
             case PlayerState.Moving:
@@ -170,15 +154,14 @@ public class PlayerController : MonoBehaviour
                 CheckForDestination();
                 break;
             case PlayerState.SwitchingFaces:
+                if (camera.rotationDone)
+                {
+                    camera.rotationDone = false;
+                    Move();
+                }
                 if (camera.faceSwitched)
                 {
                     camera.faceSwitched = false;
-                    //if (direction == movementInstructions[lastFace].left) direction = movementInstructions[currentFace].left;
-                    //else if (direction == movementInstructions[lastFace].right) direction = movementInstructions[currentFace].right;
-                    //else if (direction == movementInstructions[lastFace].up) direction = movementInstructions[currentFace].up;
-                    //else if (direction == movementInstructions[lastFace].down) direction = movementInstructions[currentFace].down;
-                    //Move();
-                    playerState = PlayerState.Stationary;
                 }
                 break;
         }
@@ -196,7 +179,7 @@ public class PlayerController : MonoBehaviour
     {
         if (playerState == PlayerState.Stationary)
         {
-            direction = movementInstructions[currentFace].left;
+            direction2D = Vector2.left;
             Move();
         }
     }
@@ -204,7 +187,7 @@ public class PlayerController : MonoBehaviour
     {
         if (playerState == PlayerState.Stationary)
         {
-            direction = movementInstructions[currentFace].right;
+            direction2D = Vector2.right;
             Move();
         }
     }
@@ -212,7 +195,7 @@ public class PlayerController : MonoBehaviour
     {
         if (playerState == PlayerState.Stationary)
         {
-            direction = movementInstructions[currentFace].up;
+            direction2D = Vector2.up;
             Move();
         }
     }
@@ -220,12 +203,58 @@ public class PlayerController : MonoBehaviour
     {
         if (playerState == PlayerState.Stationary)
         {
-            direction = movementInstructions[currentFace].down;
+            direction2D = Vector2.down;
             Move();
         }
     }
     private void Move()
     {
+        if (direction2D == Vector2.zero) return;
+        int rotation = 0;
+        for (int i = 0; i < 4; i++)
+        {
+            if (currentFace >= 0 && currentFace <= 3)
+            {
+                if (camera.transform.rotation.z == i * 90)
+                {
+                    rotation = i;
+                }
+            }
+            else if (currentFace == 4)
+            {
+                if (camera.transform.rotation.y == -(i * 90))
+                {
+                    rotation = i;
+                }
+            }
+            else if (currentFace == 5)
+            {
+                if (camera.transform.rotation.y == i * 90)
+                {
+                    rotation = i;
+                }
+            }
+        }
+        if (direction2D == Vector2.up)
+        {
+            if (0 + rotation >= 4) rotation -= 4;
+            direction = movementInstructions[currentFace, 0 + rotation];
+        }
+        else if (direction2D == Vector2.right)
+        {
+            if (1 + rotation >= 4) rotation -= 4;
+            direction = movementInstructions[currentFace, 1 + rotation];
+        }
+        else if (direction2D == Vector2.down)
+        {
+            if (2 + rotation >= 4) rotation -= 4;
+            direction = movementInstructions[currentFace, 2 + rotation];
+        }
+        else if (direction2D == Vector2.left)
+        {
+            if (3 + rotation >= 4) rotation -= 4;
+            direction = movementInstructions[currentFace, 3 + rotation];
+        }
         spacesMoving = CheckLine(direction);
         if (spacesMoving == 0) direction = Vector3.zero;
         else if (spacesMoving > 0)
@@ -238,12 +267,12 @@ public class PlayerController : MonoBehaviour
     #region Movement Checks 
     private void CheckForDestination()
     {
-        Vector3 vectorToDestination = currentPosition + direction * spacesMoving * voxelSize - transform.position + movementInstructions[currentFace].toGrid * 0.1f;
+        Vector3 vectorToDestination = currentPosition + direction * spacesMoving * voxelSize - transform.position + movementInstructions[currentFace,4] * 0.1f;
         float distanceToDestination = math.pow(vectorToDestination.x, 2) + math.pow(vectorToDestination.y, 2) + math.pow(vectorToDestination.z, 2);
         if (Mathf.Abs(distanceToDestination) < snapDistance)
         {
             currentPosition = currentPosition + direction * spacesMoving * voxelSize;
-            transform.position = currentPosition + movementInstructions[currentFace].toGrid * 0.1f;
+            transform.position = currentPosition + movementInstructions[currentFace,4] * 0.1f;
             bool switchSides = CheckForFaceSwitch();
             if (!switchSides)
             {
@@ -410,96 +439,62 @@ public class PlayerController : MonoBehaviour
     private bool CheckForFaceSwitch()
     {
         bool switchFaces = false;
-        int faceDepth = 0;
-        Vector3 faceChange = Vector3.zero;
         float pixelSizeOffset = voxelSize / 2;
-        float xEdge1 = pixelSizeOffset - (worldSize[0] / 2 + 1) * voxelSize;
-        float xEdge2 = xEdge1 + (worldSize[0] + 1) * voxelSize;
-        float yEdge1 = -pixelSizeOffset + (worldSize[1] / 2 + 1) * voxelSize;
-        float yEdge2 = yEdge1 - (worldSize[1] + 1) * voxelSize;
-        float zEdge1 = pixelSizeOffset - (worldSize[2] / 2 + 1) * voxelSize;
-        float zEdge2 = zEdge1 + (worldSize[2] + 1) * voxelSize;
-        lastFace = currentFace;
-        if (currentPosition.x == xEdge1 && currentPosition.z == zEdge1)
+        float xEdge1 = pixelSizeOffset - (worldSize.x / 2 + 1) * voxelSize;
+        float xEdge2 = xEdge1 + (worldSize.x + 1) * voxelSize;
+        float yEdge1 = -pixelSizeOffset + (worldSize.y / 2 + 1) * voxelSize;
+        float yEdge2 = yEdge1 - (worldSize.y + 1) * voxelSize;
+        float zEdge1 = pixelSizeOffset - (worldSize.z / 2 + 1) * voxelSize;
+        float zEdge2 = zEdge1 + (worldSize.z + 1) * voxelSize;
+        if (currentPosition.x == xEdge1 && currentPosition.z == zEdge1 || currentPosition.x == xEdge2 && currentPosition.z == zEdge1 || currentPosition.y == yEdge1 && currentPosition.z == zEdge1 || currentPosition.y == yEdge2 && currentPosition.z == zEdge1 || currentPosition.x == xEdge1 && currentPosition.z == zEdge2 || currentPosition.x == xEdge2 && currentPosition.z == zEdge2 || currentPosition.y == yEdge1 && currentPosition.z == zEdge2 || currentPosition.y == yEdge2 && currentPosition.z == zEdge2 || currentPosition.x == xEdge1 && currentPosition.y == yEdge1 || currentPosition.x == xEdge2 && currentPosition.y == yEdge1 || currentPosition.x == xEdge1 && currentPosition.y == yEdge2 || currentPosition.x == xEdge2 && currentPosition.y == yEdge2)
         {
-            switchFaces = true;
-            if (currentFace == 0) currentFace = 2;
-            else if (currentFace == 2) currentFace = 0;
-        }
-        else if (currentPosition.x == xEdge2 && currentPosition.z == zEdge1)
-        {
-            switchFaces = true;
-            if (currentFace == 0) currentFace = 3;
-            else if (currentFace == 3) currentFace = 0;
-        }
-        else if (currentPosition.y == yEdge1 && currentPosition.z == zEdge1)
-        {
-            switchFaces = true;
-            if (currentFace == 0) currentFace = 4;
-            else if (currentFace == 4) currentFace = 0;
-        }
-        else if (currentPosition.y == yEdge2 && currentPosition.z == zEdge1)
-        {
-            switchFaces = true;
-            if (currentFace == 0) currentFace = 5;
-            else if (currentFace == 5) currentFace = 0;
-        }
-        else if (currentPosition.x == xEdge1 && currentPosition.z == zEdge2)
-        {
-            switchFaces = true;
-            if (currentFace == 1) currentFace = 2;
-            else if (currentFace == 2) currentFace = 1;
-        }
-        else if (currentPosition.x == xEdge2 && currentPosition.z == zEdge2)
-        {
-            switchFaces = true;
-            if (currentFace == 1) currentFace = 3;
-            else if (currentFace == 3) currentFace = 1;
-        }
-        else if (currentPosition.y == yEdge1 && currentPosition.z == zEdge2)
-        {
-            switchFaces = true;
-            if (currentFace == 1) currentFace = 4;
-            else if (currentFace == 4) currentFace = 1;
-        }
-        else if (currentPosition.y == yEdge2 && currentPosition.z == zEdge2)
-        {
-            switchFaces = true;
-            if (currentFace == 1) currentFace = 5;
-            else if (currentFace == 5) currentFace = 1;
-        }
-        else if (currentPosition.x == xEdge1 && currentPosition.y == yEdge1)
-        {
-            switchFaces = true;
-            if (currentFace == 4) currentFace = 2;
-            else if (currentFace == 2) currentFace = 4;
-        }
-        else if (currentPosition.x == xEdge2 && currentPosition.y == yEdge1)
-        {
-            switchFaces = true;
-            if (currentFace == 4) currentFace = 3;
-            else if (currentFace == 3) currentFace = 4;
-        }
-        else if (currentPosition.x == xEdge1 && currentPosition.y == yEdge2)
-        {
-            switchFaces = true;
-            if (currentFace == 5) currentFace = 2;
-            else if (currentFace == 2) currentFace = 5;
-        }
-        else if (currentPosition.x == xEdge2 && currentPosition.y == yEdge2)
-        {
-            switchFaces = true;
-            if (currentFace == 5) currentFace = 3;
-            else if (currentFace == 3) currentFace = 5;
-        }
-        if (currentFace == 0 || currentFace == 1) faceDepth = worldSize[2];
-        else if (currentFace == 2 || currentFace == 3) faceDepth = worldSize[0];
-        else if (currentFace == 4 || currentFace == 5) faceDepth = worldSize[1];
-        if (switchFaces)
-        {
+            camera.RotateCameraForSwitch(direction);
+            if (currentFace == 0)
+            {
+                if (direction == Vector3.left) currentFace = 2;
+                else if (direction == Vector3.right) currentFace = 3;
+                else if (direction == Vector3.up) currentFace = 4;
+                else if (direction == Vector3.down) currentFace = 5;
+            }
+            else if (currentFace == 1)
+            {
+                if (direction == Vector3.right) currentFace = 3;
+                else if (direction == Vector3.left) currentFace = 2;
+                else if (direction == Vector3.up) currentFace = 4;
+                else if (direction == Vector3.down) currentFace = 5;
+            }
+            else if (currentFace == 2)
+            {
+                if (direction == Vector3.forward) currentFace = 1;
+                else if (direction == Vector3.back) currentFace = 0;
+                else if (direction == Vector3.up) currentFace = 4;
+                else if (direction == Vector3.down) currentFace = 5;
+            }
+            else if (currentFace == 3)
+            {
+                if (direction == Vector3.back) currentFace = 0;
+                else if (direction == Vector3.forward) currentFace = 1;
+                else if (direction == Vector3.up) currentFace = 4;
+                else if (direction == Vector3.down) currentFace = 5;
+            }
+            else if (currentFace == 4)
+            {
+                if (direction == Vector3.left) currentFace = 2;
+                else if (direction == Vector3.right) currentFace = 3;
+                else if (direction == Vector3.forward) currentFace = 1;
+                else if (direction == Vector3.back) currentFace = 0;
+            }
+            else if (currentFace == 5)
+            {
+                if (direction == Vector3.left) currentFace = 2;
+                else if (direction == Vector3.right) currentFace = 3;
+                else if (direction == Vector3.back) currentFace = 0;
+                else if (direction == Vector3.forward) currentFace = 1;
+            }
             playerState = PlayerState.SwitchingFaces;
-            camera.SwitchFace(faceDepth, currentFace, lastFace, movementInstructions[currentFace].toGrid);
-            transform.position = currentPosition + movementInstructions[currentFace].toGrid * 0.1f;
+            switchFaces = true;
+            camera.SwitchFace(worldSize);
+            transform.position = currentPosition + movementInstructions[currentFace,4] * 0.1f;
         }
         return switchFaces;
     }
