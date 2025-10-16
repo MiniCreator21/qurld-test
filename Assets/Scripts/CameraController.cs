@@ -19,10 +19,10 @@ public class CameraController : MonoBehaviour
     new CinemachineCamera camera;
     #endregion
     #region Public Fields
+    public Vector3 currentUpVector = Vector3.up;
     public bool faceSwitched = false;
     #endregion
     #region Private Variables
-    private Vector3 currentUpVector = Vector3.up;
     #endregion
 
     #region Start

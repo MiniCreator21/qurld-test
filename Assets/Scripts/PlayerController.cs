@@ -207,21 +207,9 @@ public class PlayerController : MonoBehaviour
     {
         if (direction2D == Vector2.zero) return;
         int rotation = 0;
-        Vector3 cameraRotation = camera.transform.eulerAngles;
-        //if (cameraRotation.x < 0) cameraRotation.x += 360;
-        //if (cameraRotation.y < 0) cameraRotation.y += 360;
-        //if (cameraRotation.z < 0) cameraRotation.z += 360;
-        //if (cameraRotation.x >= 360) cameraRotation.x -= 360;
-        //if (cameraRotation.y >= 360) cameraRotation.y -= 360;
-        //if (cameraRotation.z >= 360) cameraRotation.z -= 360;
-        Debug.Log(cameraRotation);
         for (int i = 0; i < 4; i++)
         {
-            if (cameraRotation.z == i * 90)
-            {
-                rotation = i;
-                Debug.Log("rotation = " + i);
-            }
+            if (camera.currentUpVector == movementInstructions[currentFace, i]) rotation = i;
         }
         if (direction2D == Vector2.up)
         {
